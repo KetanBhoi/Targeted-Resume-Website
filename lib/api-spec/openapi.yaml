@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: ambassador
+    description: Evidence-grounded candidate questions
 paths:
   /healthz:
     get:
@@ -24,6 +26,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /ambassador/answer:
+    post:
+      operationId: askAmbassador
+      tags: [ambassador]
+      summary: Ask the candidate ambassador a question
+      description: Answers using only the candidate's verified public resume facts. Chat content is not persisted or logged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AmbassadorQuestionInput"
+      responses:
+        "200":
+          description: Grounded answer or an unsupported-information refusal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AmbassadorAnswer"
+        "400":
+          description: Invalid question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Ambassador temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +72,31 @@ components:
           type: string
       required:
         - status
+    AmbassadorQuestionInput:
+      type: object
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 600
+      required:
+        - question
+    AmbassadorAnswer:
+      type: object
+      properties:
+        answer:
+          type: string
+        section:
+          type: [string, "null"]
+          enum: [about, role-fit, experience, projects, skills, education, null]
+      required:
+        - answer
+        - section
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 

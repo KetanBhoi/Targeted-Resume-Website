@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Ketan Bhoi — Recruiter Portfolio"
+description = "A role-specific visual resume and evidence-grounded virtual ambassador for Ketan Bhoi's recruiter and talent acquisition candidacy. Public contact links and sanitized resume downloads are included only after they are provided and verified."
+version = "1.0.0"
+id = "artifacts/ketan-resume"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19832
+
+[services.development]
+run = "pnpm --filter @workspace/ketan-resume run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ketan-resume", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ketan-resume/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19832"
+BASE_PATH = "/"
