@@ -40,12 +40,12 @@ const starterQuestions = [
   { label: 'Leadership', question: 'What evidence of leadership is listed?' },
 ];
 
-function SectionLabel({ children, index }: { children: ReactNode; index: string }) {
+function SectionLabel({ children, index, inverse = false }: { children: ReactNode; index: string; inverse?: boolean }) {
   return (
-    <div className="mb-7 flex items-center gap-3 font-mono-custom text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-      <span className="flex size-6 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">{index}</span>
+    <div className={`mb-8 flex items-center gap-3 font-mono-custom text-[10px] uppercase tracking-[0.18em] ${inverse ? 'section-label-inverse' : 'text-muted-foreground'}`}>
+      <span className="section-index flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">{index}</span>
       <span>{children}</span>
-      <span className="h-px flex-1 bg-border" />
+      <span className={`section-rule h-px flex-1 ${inverse ? '' : 'bg-border'}`} />
     </div>
   );
 }
@@ -69,7 +69,7 @@ function AnchorButton({ href, children, muted = false }: { href: string; childre
 function Header({ onDownload }: { onDownload: () => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-5 py-4 lg:px-10">
+      <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-5 py-3.5 lg:px-10 lg:py-4">
         <a href="#about" className="group flex items-center gap-3" data-testid="link-home">
           <span className="flex size-9 items-center justify-center rounded-full bg-primary font-display text-lg text-primary-foreground transition-transform group-hover:rotate-[-8deg]">
             K
@@ -142,12 +142,12 @@ function Hero({ onDownload }: { onDownload: () => void }) {
               <p className="mt-3 font-display text-4xl leading-none sm:text-5xl" data-testid="text-target-role">{portfolio.targetRole}</p>
             </div>
             <div className="border-t border-primary-foreground/20 pt-4">
-              <p className="max-w-sm text-sm leading-6 text-primary-foreground/75">{portfolio.context}</p>
+              <p className="max-w-sm text-sm leading-6 text-primary-foreground/85">{portfolio.context}</p>
             </div>
           </div>
           <div className="mt-8 flex items-start gap-3 border-l-2 border-accent pl-4">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-            <p className="text-xs leading-5 text-muted-foreground">
+            <p className="max-w-md text-xs leading-5 text-muted-foreground">
               Built for a fast, fair review: every claim below points back to a named project, role, skill, or credential.
             </p>
           </div>
@@ -172,13 +172,13 @@ function RoleFit() {
         </div>
         <div className="grid gap-3">
           {portfolio.strengths.map((strength, index) => (
-            <article key={strength.title} className="proof-card group grid gap-5 border border-border bg-card p-5 sm:grid-cols-[48px_1fr_auto] sm:items-start sm:p-6" data-testid={`card-strength-${index}`}>
+            <article key={strength.title} className="proof-card group grid gap-4 border border-border bg-card p-5 sm:grid-cols-[48px_1fr_auto] sm:items-start sm:gap-5 sm:p-6" data-testid={`card-strength-${index}`}>
               <span className="font-mono-custom text-xs text-muted-foreground">0{index + 1}</span>
               <div>
                 <h3 className="font-display text-3xl leading-none">{strength.title}</h3>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">{strength.detail}</p>
               </div>
-              <div className="flex items-center gap-2 text-right font-mono-custom text-[10px] uppercase tracking-[0.1em] text-primary sm:max-w-[145px] sm:justify-end">
+              <div className="flex items-center gap-2 text-left font-mono-custom text-[10px] uppercase tracking-[0.1em] text-primary sm:max-w-[145px] sm:justify-end sm:text-right">
                 <Check className="size-3.5 text-accent-foreground" aria-hidden="true" />
                 {strength.proof}
               </div>
@@ -204,7 +204,7 @@ function Experience() {
           </div>
           <div className="space-y-10">
             {portfolio.experiences.map((experience, index) => (
-              <article key={`${experience.company}-${experience.title}`} className="relative border-l border-primary pl-6 sm:pl-8" data-testid={`card-experience-${index}`}>
+              <article key={`${experience.company}-${experience.title}`} className="relative border-l-2 border-primary pl-5 sm:pl-8" data-testid={`card-experience-${index}`}>
                 <span className="absolute -left-[5px] top-1 size-[9px] rounded-full bg-accent ring-4 ring-secondary" />
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h3 className="font-display text-3xl">{experience.title}</h3>
@@ -233,10 +233,10 @@ function Experience() {
                 <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Project scope, as documented</p>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-primary-foreground/75">{portfolio.projects[0].problem}</p>
               </div>
-              <p className="mt-6 max-w-2xl text-sm leading-6 text-primary-foreground/75">{portfolio.projects[0].contribution}</p>
+              <p className="mt-6 max-w-2xl text-sm leading-6 text-primary-foreground/85">{portfolio.projects[0].contribution}</p>
               <div className="mt-6 border-t border-primary-foreground/20 pt-5">
                 <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Outcome, stated plainly</p>
-                <p className="mt-2 text-sm leading-6 text-primary-foreground/75">{portfolio.projects[0].outcome}</p>
+                <p className="mt-2 text-sm leading-6 text-primary-foreground/85">{portfolio.projects[0].outcome}</p>
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 {portfolio.projects[0].tools.map((tool) => (
@@ -288,7 +288,7 @@ function Education() {
   return (
     <section id="education" className="anchor-target border-y border-border bg-primary text-primary-foreground">
       <div className="mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
-        <SectionLabel index="04">Education + certificates</SectionLabel>
+        <SectionLabel index="04" inverse>Education + certificates</SectionLabel>
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-8">
             {portfolio.education.map((item, index) => (
@@ -298,7 +298,7 @@ function Education() {
                   <p className="font-mono-custom text-[10px] uppercase tracking-[0.1em] text-primary-foreground/55">{item.completed}</p>
                 </div>
                 <h3 className="mt-4 max-w-lg font-display text-3xl leading-tight">{item.credential}</h3>
-                <p className="mt-2 max-w-lg text-sm leading-6 text-primary-foreground/65">{item.institution}</p>
+                <p className="mt-2 max-w-lg text-sm leading-6 text-primary-foreground/80">{item.institution}</p>
                 {item.result && <p className="mt-3 font-mono-custom text-xs text-accent">{item.result}</p>}
               </article>
             ))}
@@ -307,7 +307,7 @@ function Education() {
             <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Certificates</p>
             <ul className="mt-6 space-y-4">
               {portfolio.certificates.map((certificate) => (
-                <li key={certificate} className="flex gap-3 text-sm leading-6 text-primary-foreground/75" data-testid={`text-certificate-${certificate.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <li key={certificate} className="flex gap-3 text-sm leading-6 text-primary-foreground/85" data-testid={`text-certificate-${certificate.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
                   <Check className="mt-1 size-4 shrink-0 text-accent" aria-hidden="true" /> {certificate}
                 </li>
               ))}

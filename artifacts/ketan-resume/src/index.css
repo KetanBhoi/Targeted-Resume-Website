@@ -37,37 +37,37 @@
 }
 
 :root {
-  --background: 42 36% 95%;
-  --foreground: 221 29% 18%;
-  --border: 38 19% 82%;
-  --card: 42 42% 98%;
-  --card-foreground: 221 29% 18%;
-  --card-border: 38 19% 82%;
-  --popover: 42 42% 98%;
-  --popover-foreground: 221 29% 18%;
-  --popover-border: 38 19% 82%;
-  --primary: 221 29% 18%;
-  --primary-foreground: 42 36% 95%;
-  --secondary: 36 25% 89%;
-  --secondary-foreground: 221 29% 18%;
-  --muted: 36 25% 89%;
-  --muted-foreground: 221 11% 43%;
-  --accent: 64 68% 57%;
-  --accent-foreground: 221 29% 18%;
+  --background: 42 34% 94%;
+  --foreground: 221 30% 16%;
+  --border: 38 18% 77%;
+  --card: 42 38% 98%;
+  --card-foreground: 221 30% 16%;
+  --card-border: 38 18% 77%;
+  --popover: 42 38% 98%;
+  --popover-foreground: 221 30% 16%;
+  --popover-border: 38 18% 77%;
+  --primary: 221 30% 16%;
+  --primary-foreground: 42 34% 94%;
+  --secondary: 38 24% 87%;
+  --secondary-foreground: 221 30% 16%;
+  --muted: 38 24% 87%;
+  --muted-foreground: 221 16% 34%;
+  --accent: 66 70% 55%;
+  --accent-foreground: 221 30% 16%;
   --destructive: 3 59% 43%;
-  --destructive-foreground: 42 36% 95%;
-  --input: 38 19% 82%;
-  --ring: 64 68% 57%;
+  --destructive-foreground: 42 34% 94%;
+  --input: 38 18% 77%;
+  --ring: 66 70% 55%;
   --app-font-sans: 'Manrope', sans-serif;
   --app-font-serif: 'Newsreader', Georgia, serif;
   --app-font-mono: 'DM Mono', monospace;
   --radius: 0.25rem;
-  --shadow-2xs: 0 1px 0 hsl(221 29% 18% / 0.04);
-  --shadow-xs: 0 2px 0 hsl(221 29% 18% / 0.04);
-  --shadow-sm: 0 4px 12px hsl(221 29% 18% / 0.06);
-  --shadow: 0 8px 30px hsl(221 29% 18% / 0.07);
-  --shadow-md: 0 16px 40px hsl(221 29% 18% / 0.09);
-  --shadow-lg: 0 24px 60px hsl(221 29% 18% / 0.12);
+  --shadow-2xs: 0 1px 0 hsl(221 30% 16% / 0.05);
+  --shadow-xs: 0 2px 0 hsl(221 30% 16% / 0.05);
+  --shadow-sm: 0 4px 12px hsl(221 30% 16% / 0.08);
+  --shadow: 0 8px 30px hsl(221 30% 16% / 0.09);
+  --shadow-md: 0 16px 40px hsl(221 30% 16% / 0.11);
+  --shadow-lg: 0 24px 60px hsl(221 30% 16% / 0.14);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
@@ -87,7 +87,7 @@
   --secondary: 221 22% 28%;
   --secondary-foreground: 42 36% 95%;
   --muted: 221 22% 28%;
-  --muted-foreground: 42 16% 72%;
+  --muted-foreground: 42 18% 78%;
   --accent: 64 68% 57%;
   --accent-foreground: 221 29% 18%;
   --destructive: 3 59% 53%;
@@ -102,6 +102,7 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     min-width: 320px;
+    text-rendering: optimizeLegibility;
   }
   ::selection { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
   :focus-visible { outline: 3px solid hsl(var(--accent)); outline-offset: 3px; }
@@ -111,7 +112,7 @@
   .font-display { font-family: var(--app-font-serif); }
   .font-mono-custom { font-family: var(--app-font-mono); }
   .paper-grid {
-    background-image: linear-gradient(hsl(221 29% 18% / .045) 1px, transparent 1px), linear-gradient(90deg, hsl(221 29% 18% / .045) 1px, transparent 1px);
+    background-image: linear-gradient(hsl(221 30% 16% / .05) 1px, transparent 1px), linear-gradient(90deg, hsl(221 30% 16% / .05) 1px, transparent 1px);
     background-size: 28px 28px;
   }
   .text-balance { text-wrap: balance; }
@@ -123,7 +124,7 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: .27;
+  opacity: .2;
   z-index: 20;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
@@ -141,7 +142,14 @@
 .anchor-target { scroll-margin-top: 96px; }
 .chat-scroll { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
 .chat-message { animation: message-in .3s ease both; }
+.section-label-inverse { color: hsl(var(--primary-foreground) / .72); }
+.section-label-inverse .section-index { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
+.section-label-inverse .section-rule { background: hsl(var(--primary-foreground) / .24); }
 @keyframes message-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 767px) {
+  .site-shell::before { opacity: .14; }
+  .anchor-target { scroll-margin-top: 80px; }
 }
