@@ -1,0 +1,1 @@
+- [React version changes and Vite cache](react-vite-cache.md) — a stale optimized bundle can preserve a React mismatch after installed versions are aligned.

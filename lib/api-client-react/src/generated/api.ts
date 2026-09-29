@@ -23,7 +23,12 @@ import type {
   AmbassadorAnswer,
   AmbassadorQuestionInput,
   ApiError,
-  HealthStatus
+  HealthStatus,
+  ListWorkspaceRecordsParams,
+  WorkspaceGenerationInput,
+  WorkspaceRecord,
+  WorkspaceRecordInput,
+  WorkspaceRecordUpdate
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -218,5 +223,428 @@ export const useAskAmbassador = <TError = ErrorType<ApiError>,
         TContext
       > => {
       return useMutation(getAskAmbassadorMutationOptions(options));
+    }
+
+export const getListWorkspaceRecordsUrl = (params?: ListWorkspaceRecordsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/workspace/records?${stringifiedParams}` : `/api/workspace/records`
+}
+
+/**
+ * @summary List the signed-in user's saved workspace records
+ */
+export const listWorkspaceRecords = async (params?: ListWorkspaceRecordsParams, options?: Parameters<typeof customFetch>[1]): Promise<WorkspaceRecord[]> => {
+
+  return customFetch<WorkspaceRecord[]>(getListWorkspaceRecordsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListWorkspaceRecordsQueryKey = (params?: ListWorkspaceRecordsParams,) => {
+    return [
+    `/api/workspace/records`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListWorkspaceRecordsQueryOptions = <TData = Awaited<ReturnType<typeof listWorkspaceRecords>>, TError = ErrorType<ApiError>>(params?: ListWorkspaceRecordsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWorkspaceRecords>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWorkspaceRecordsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkspaceRecords>>> = ({ signal }) => listWorkspaceRecords(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkspaceRecords>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListWorkspaceRecordsQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkspaceRecords>>>
+export type ListWorkspaceRecordsQueryError = ErrorType<ApiError>
+
+
+/**
+ * @summary List the signed-in user's saved workspace records
+ */
+
+export function useListWorkspaceRecords<TData = Awaited<ReturnType<typeof listWorkspaceRecords>>, TError = ErrorType<ApiError>>(
+ params?: ListWorkspaceRecordsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWorkspaceRecords>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListWorkspaceRecordsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateWorkspaceRecordUrl = () => {
+
+
+
+
+  return `/api/workspace/records`
+}
+
+/**
+ * @summary Save a workspace record
+ */
+export const createWorkspaceRecord = async (workspaceRecordInput: WorkspaceRecordInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkspaceRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WorkspaceRecord>(getCreateWorkspaceRecordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(workspaceRecordInput)
+  }
+);}
+
+
+
+
+
+export const getCreateWorkspaceRecordMutationKey = () => ['createWorkspaceRecord'] as const;
+
+export const getCreateWorkspaceRecordMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspaceRecord>>, TError,CreateWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkspaceRecord>>, TError,CreateWorkspaceRecordMutationVariables, TContext> => {
+
+const mutationKey = getCreateWorkspaceRecordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkspaceRecord>>, CreateWorkspaceRecordMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createWorkspaceRecord(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateWorkspaceRecordMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkspaceRecord>>>
+    export type CreateWorkspaceRecordMutationBody = BodyType<WorkspaceRecordInput>
+    export type CreateWorkspaceRecordMutationError = ErrorType<ApiError>
+    export type CreateWorkspaceRecordMutationVariables = {data: BodyType<WorkspaceRecordInput>}
+
+    /**
+ * @summary Save a workspace record
+ */
+export const useCreateWorkspaceRecord = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkspaceRecord>>, TError,CreateWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createWorkspaceRecord>>,
+        TError,
+        CreateWorkspaceRecordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateWorkspaceRecordMutationOptions(options));
+    }
+
+export const getUpdateWorkspaceRecordUrl = (id: number,) => {
+
+
+
+
+  return `/api/workspace/records/${id}`
+}
+
+/**
+ * @summary Update one of the signed-in user's records
+ */
+export const updateWorkspaceRecord = async (id: number,
+    workspaceRecordUpdate: WorkspaceRecordUpdate, options?: Parameters<typeof customFetch>[1]): Promise<WorkspaceRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WorkspaceRecord>(getUpdateWorkspaceRecordUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(workspaceRecordUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateWorkspaceRecordMutationKey = () => ['updateWorkspaceRecord'] as const;
+
+export const getUpdateWorkspaceRecordMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkspaceRecord>>, TError,UpdateWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkspaceRecord>>, TError,UpdateWorkspaceRecordMutationVariables, TContext> => {
+
+const mutationKey = getUpdateWorkspaceRecordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkspaceRecord>>, UpdateWorkspaceRecordMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateWorkspaceRecord(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkspaceRecordMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkspaceRecord>>>
+    export type UpdateWorkspaceRecordMutationBody = BodyType<WorkspaceRecordUpdate>
+    export type UpdateWorkspaceRecordMutationError = ErrorType<ApiError>
+    export type UpdateWorkspaceRecordMutationVariables = {id: number;data: BodyType<WorkspaceRecordUpdate>}
+
+    /**
+ * @summary Update one of the signed-in user's records
+ */
+export const useUpdateWorkspaceRecord = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkspaceRecord>>, TError,UpdateWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkspaceRecord>>,
+        TError,
+        UpdateWorkspaceRecordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateWorkspaceRecordMutationOptions(options));
+    }
+
+export const getDeleteWorkspaceRecordUrl = (id: number,) => {
+
+
+
+
+  return `/api/workspace/records/${id}`
+}
+
+/**
+ * @summary Delete one of the signed-in user's records
+ */
+export const deleteWorkspaceRecord = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteWorkspaceRecordUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteWorkspaceRecordMutationKey = () => ['deleteWorkspaceRecord'] as const;
+
+export const getDeleteWorkspaceRecordMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspaceRecord>>, TError,DeleteWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspaceRecord>>, TError,DeleteWorkspaceRecordMutationVariables, TContext> => {
+
+const mutationKey = getDeleteWorkspaceRecordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspaceRecord>>, DeleteWorkspaceRecordMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteWorkspaceRecord(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkspaceRecordMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspaceRecord>>>
+
+    export type DeleteWorkspaceRecordMutationError = ErrorType<ApiError>
+    export type DeleteWorkspaceRecordMutationVariables = {id: number}
+
+    /**
+ * @summary Delete one of the signed-in user's records
+ */
+export const useDeleteWorkspaceRecord = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspaceRecord>>, TError,DeleteWorkspaceRecordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkspaceRecord>>,
+        TError,
+        DeleteWorkspaceRecordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteWorkspaceRecordMutationOptions(options));
+    }
+
+export const getGenerateWorkspaceContentUrl = () => {
+
+
+
+
+  return `/api/workspace/generate`
+}
+
+/**
+ * @summary Generate and save a match analysis or career preparation draft
+ */
+export const generateWorkspaceContent = async (workspaceGenerationInput: WorkspaceGenerationInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkspaceRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WorkspaceRecord>(getGenerateWorkspaceContentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(workspaceGenerationInput)
+  }
+);}
+
+
+
+
+
+export const getGenerateWorkspaceContentMutationKey = () => ['generateWorkspaceContent'] as const;
+
+export const getGenerateWorkspaceContentMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateWorkspaceContent>>, TError,GenerateWorkspaceContentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateWorkspaceContent>>, TError,GenerateWorkspaceContentMutationVariables, TContext> => {
+
+const mutationKey = getGenerateWorkspaceContentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateWorkspaceContent>>, GenerateWorkspaceContentMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateWorkspaceContent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateWorkspaceContentMutationResult = NonNullable<Awaited<ReturnType<typeof generateWorkspaceContent>>>
+    export type GenerateWorkspaceContentMutationBody = BodyType<WorkspaceGenerationInput>
+    export type GenerateWorkspaceContentMutationError = ErrorType<ApiError>
+    export type GenerateWorkspaceContentMutationVariables = {data: BodyType<WorkspaceGenerationInput>}
+
+    /**
+ * @summary Generate and save a match analysis or career preparation draft
+ */
+export const useGenerateWorkspaceContent = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateWorkspaceContent>>, TError,GenerateWorkspaceContentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof generateWorkspaceContent>>,
+        TError,
+        GenerateWorkspaceContentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getGenerateWorkspaceContentMutationOptions(options));
     }
 

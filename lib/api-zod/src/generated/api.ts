@@ -35,3 +35,127 @@ export const AskAmbassadorResponse = zod.object({
 })
 
 
+/**
+ * @summary List the signed-in user's saved workspace records
+ */
+export const ListWorkspaceRecordsQueryParams = zod.object({
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']).optional()
+})
+
+export const ListWorkspaceRecordsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListWorkspaceRecordsResponse = zod.array(ListWorkspaceRecordsResponseItem)
+
+
+/**
+ * @summary Save a workspace record
+ */
+export const createWorkspaceRecordBodyTitleMax = 160;
+
+export const createWorkspaceRecordBodyContentMax = 50000;
+
+
+
+export const CreateWorkspaceRecordBody = zod.object({
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string().min(1).max(createWorkspaceRecordBodyTitleMax),
+  "content": zod.string().max(createWorkspaceRecordBodyContentMax),
+  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+})
+
+export const CreateWorkspaceRecordResponse = zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update one of the signed-in user's records
+ */
+
+
+
+export const UpdateWorkspaceRecordParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const updateWorkspaceRecordBodyTitleMax = 160;
+
+export const updateWorkspaceRecordBodyContentMax = 50000;
+
+
+
+export const UpdateWorkspaceRecordBody = zod.object({
+  "title": zod.string().min(1).max(updateWorkspaceRecordBodyTitleMax).optional(),
+  "content": zod.string().max(updateWorkspaceRecordBodyContentMax).optional(),
+  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+})
+
+export const UpdateWorkspaceRecordResponse = zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete one of the signed-in user's records
+ */
+
+
+
+export const DeleteWorkspaceRecordParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const DeleteWorkspaceRecordResponse = zod.void()
+
+
+/**
+ * @summary Generate and save a match analysis or career preparation draft
+ */
+export const generateWorkspaceContentBodyTitleMax = 160;
+
+export const generateWorkspaceContentBodyResumeTextMax = 20000;
+
+export const generateWorkspaceContentBodyJobDescriptionMax = 20000;
+
+export const generateWorkspaceContentBodyInstructionsMax = 2000;
+
+
+
+export const GenerateWorkspaceContentBody = zod.object({
+  "kind": zod.enum(['analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string().min(1).max(generateWorkspaceContentBodyTitleMax),
+  "resumeText": zod.string().min(1).max(generateWorkspaceContentBodyResumeTextMax),
+  "jobDescription": zod.string().max(generateWorkspaceContentBodyJobDescriptionMax).optional(),
+  "instructions": zod.string().max(generateWorkspaceContentBodyInstructionsMax).optional()
+})
+
+export const GenerateWorkspaceContentResponse = zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+

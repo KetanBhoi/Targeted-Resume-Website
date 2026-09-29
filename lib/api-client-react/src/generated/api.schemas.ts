@@ -42,3 +42,86 @@ export interface ApiError {
   error: string;
 }
 
+export type WorkspaceRecordKind = typeof WorkspaceRecordKind[keyof typeof WorkspaceRecordKind];
+
+
+export const WorkspaceRecordKind = {
+  resume: 'resume',
+  job: 'job',
+  analysis: 'analysis',
+  interview: 'interview',
+  'cover-letter': 'cover-letter',
+  linkedin: 'linkedin',
+} as const;
+
+export type WorkspaceRecordMetadata = { [key: string]: unknown };
+
+export interface WorkspaceRecord {
+  id: number;
+  kind: WorkspaceRecordKind;
+  title: string;
+  content: string;
+  metadata: WorkspaceRecordMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorkspaceRecordInputMetadata = { [key: string]: unknown };
+
+export interface WorkspaceRecordInput {
+  kind: WorkspaceRecordKind;
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  title: string;
+  /** @maxLength 50000 */
+  content: string;
+  metadata?: WorkspaceRecordInputMetadata;
+}
+
+export type WorkspaceRecordUpdateMetadata = { [key: string]: unknown };
+
+export interface WorkspaceRecordUpdate {
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  title?: string;
+  /** @maxLength 50000 */
+  content?: string;
+  metadata?: WorkspaceRecordUpdateMetadata;
+}
+
+export type WorkspaceGenerationInputKind = typeof WorkspaceGenerationInputKind[keyof typeof WorkspaceGenerationInputKind];
+
+
+export const WorkspaceGenerationInputKind = {
+  analysis: 'analysis',
+  interview: 'interview',
+  'cover-letter': 'cover-letter',
+  linkedin: 'linkedin',
+} as const;
+
+export interface WorkspaceGenerationInput {
+  kind: WorkspaceGenerationInputKind;
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 20000
+     */
+  resumeText: string;
+  /** @maxLength 20000 */
+  jobDescription?: string;
+  /** @maxLength 2000 */
+  instructions?: string;
+}
+
+export type ListWorkspaceRecordsParams = {
+kind?: WorkspaceRecordKind;
+};
+

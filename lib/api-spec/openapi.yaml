@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: ambassador
     description: Evidence-grounded candidate questions
+  - name: workspace
+    description: Private candidate workspace records and preparation tools
 paths:
   /healthz:
     get:
@@ -63,6 +65,166 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /workspace/records:
+    get:
+      operationId: listWorkspaceRecords
+      tags: [workspace]
+      summary: List the signed-in user's saved workspace records
+      parameters:
+        - name: kind
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/WorkspaceRecordKind"
+      responses:
+        "200":
+          description: Workspace records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkspaceRecord"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: createWorkspaceRecord
+      tags: [workspace]
+      summary: Save a workspace record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceRecordInput"
+      responses:
+        "201":
+          description: Saved record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceRecord"
+        "400":
+          description: Invalid record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workspace/records/{id}:
+    patch:
+      operationId: updateWorkspaceRecord
+      tags: [workspace]
+      summary: Update one of the signed-in user's records
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceRecordUpdate"
+      responses:
+        "200":
+          description: Updated record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceRecord"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      operationId: deleteWorkspaceRecord
+      tags: [workspace]
+      summary: Delete one of the signed-in user's records
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "204":
+          description: Record deleted
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Record not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workspace/generate:
+    post:
+      operationId: generateWorkspaceContent
+      tags: [workspace]
+      summary: Generate and save a match analysis or career preparation draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceGenerationInput"
+      responses:
+        "201":
+          description: Generated and saved workspace record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceRecord"
+        "400":
+          description: Invalid generation request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Content generation is temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Generation rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -99,4 +261,78 @@ components:
           type: string
       required:
         - error
+    WorkspaceRecordKind:
+      type: string
+      enum: [resume, job, analysis, interview, cover-letter, linkedin]
+    WorkspaceRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          $ref: "#/components/schemas/WorkspaceRecordKind"
+        title:
+          type: string
+        content:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, kind, title, content, metadata, createdAt, updatedAt]
+    WorkspaceRecordInput:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/WorkspaceRecordKind"
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        content:
+          type: string
+          maxLength: 50000
+        metadata:
+          type: object
+          additionalProperties: true
+      required: [kind, title, content]
+    WorkspaceRecordUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        content:
+          type: string
+          maxLength: 50000
+        metadata:
+          type: object
+          additionalProperties: true
+    WorkspaceGenerationInput:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [analysis, interview, cover-letter, linkedin]
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        resumeText:
+          type: string
+          minLength: 1
+          maxLength: 20000
+        jobDescription:
+          type: string
+          maxLength: 20000
+        instructions:
+          type: string
+          maxLength: 2000
+      required: [kind, title, resumeText]
 

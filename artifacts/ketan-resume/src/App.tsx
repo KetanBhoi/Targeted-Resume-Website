@@ -1,5 +1,8 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
+import { publishableKeyFromHost } from '@clerk/react/internal';
+import { shadcn } from '@clerk/themes';
 import {
   ArrowDown,
   ArrowUpRight,
@@ -22,9 +25,73 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { portfolio, type PortfolioSection } from '@/data/portfolio';
 import NotFound from '@/pages/not-found';
-import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
+import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
+import WorkspacePage from '@/pages/workspace';
 
 const queryClient = new QueryClient();
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+if (!clerkPubKey) {
+  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
+}
+
+function stripBase(path: string): string {
+  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
+}
+
+const clerkAppearance = {
+  theme: shadcn,
+  cssLayerName: 'clerk',
+  options: {
+    logoPlacement: 'inside' as const,
+    logoLinkUrl: basePath || '/',
+    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
+  },
+  variables: {
+    colorPrimary: '#18263f',
+    colorForeground: '#18263f',
+    colorMutedForeground: '#667085',
+    colorDanger: '#b24b3c',
+    colorBackground: '#fbf8f1',
+    colorInput: '#f4efe4',
+    colorInputForeground: '#18263f',
+    colorNeutral: '#d4cdbd',
+    fontFamily: 'Manrope, sans-serif',
+    borderRadius: '2px',
+  },
+  elements: {
+    rootBox: 'w-full flex justify-center',
+    cardBox: 'bg-[#fbf8f1] rounded-none w-[440px] max-w-full overflow-hidden border border-[#d4cdbd] shadow-[8px_8px_0_#d8ec47]',
+    card: '!shadow-none !border-0 !bg-transparent !rounded-none',
+    footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
+    headerTitle: 'text-[#18263f] font-semibold',
+    headerSubtitle: 'text-[#667085]',
+    socialButtonsBlockButtonText: 'text-[#18263f]',
+    formFieldLabel: 'text-[#18263f]',
+    footerActionLink: 'text-[#18263f] underline',
+    footerActionText: 'text-[#667085]',
+    dividerText: 'text-[#667085]',
+    identityPreviewEditButton: 'text-[#18263f]',
+    formFieldSuccessText: 'text-[#4f7b48]',
+    alertText: 'text-[#b24b3c]',
+    logoBox: 'h-10',
+    logoImage: 'max-h-10',
+    socialButtonsBlockButton: 'border-[#d4cdbd] bg-[#f4efe4]',
+    formButtonPrimary: 'bg-[#18263f] text-[#fbf8f1] hover:bg-[#273c60]',
+    formFieldInput: 'border-[#d4cdbd] bg-[#f4efe4] text-[#18263f]',
+    footerAction: 'border-[#d4cdbd]',
+    dividerLine: 'bg-[#d4cdbd]',
+    alert: 'border-[#b24b3c]',
+    otpCodeFieldInput: 'border-[#d4cdbd] bg-[#f4efe4] text-[#18263f]',
+    formFieldRow: 'text-[#18263f]',
+    main: 'text-[#18263f]',
+  },
+};
 
 const navItems: { label: string; href: string }[] = [
   { label: 'Role fit', href: '#role-fit' },
@@ -607,11 +674,66 @@ function Home() {
   );
 }
 
+function HomeRedirect() {
+  const { isLoaded, isSignedIn } = useAuth();
+  if (!isLoaded) return <div className="auth-loading" aria-label="Loading account" />;
+  return isSignedIn ? <Redirect to="/workspace" /> : <Home />;
+}
+
+function ProtectedWorkspace() {
+  const { isLoaded, isSignedIn } = useAuth();
+  if (!isLoaded) return <div className="auth-loading" aria-label="Loading workspace" />;
+  return isSignedIn ? <WorkspacePage /> : <Redirect to="/" />;
+}
+
+function SignInPage() {
+  return (
+    <div className="auth-page">
+      <div className="auth-page-kicker"><span className="workspace-brand-mark">K</span><span>Private career workbench</span></div>
+      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+    </div>
+  );
+}
+
+function SignUpPage() {
+  return (
+    <div className="auth-page">
+      <div className="auth-page-kicker"><span className="workspace-brand-mark">K</span><span>Private career workbench</span></div>
+      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+    </div>
+  );
+}
+
+function ClerkQueryClientCacheInvalidator() {
+  const { addListener } = useClerk();
+  const queryClient = useQueryClient();
+  const previousUserId = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    const unsubscribe = addListener(({ user }) => {
+      const userId = user?.id ?? null;
+      if (previousUserId.current !== undefined && previousUserId.current !== userId) {
+        queryClient.clear();
+      }
+      previousUserId.current = userId;
+    });
+    return unsubscribe;
+  }, [addListener, queryClient]);
+
+  return null;
+}
+
 function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={HomeRedirect} />
+        <Route path="/sign-in/*?" component={SignInPage} />
+        <Route path="/sign-up/*?" component={SignUpPage} />
+        <Route path="/workspace" component={ProtectedWorkspace} />
+        <Route path="/workspace/jobs" component={ProtectedWorkspace} />
+        <Route path="/workspace/match" component={ProtectedWorkspace} />
+        <Route path="/workspace/prepare" component={ProtectedWorkspace} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
@@ -623,16 +745,38 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 
+function ClerkProviderWithRoutes() {
+  const [, setLocation] = useLocation();
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      appearance={clerkAppearance}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      localization={{
+        signIn: { start: { title: 'Welcome back', subtitle: 'Return to your private workbench' } },
+        signUp: { start: { title: 'Make space for better work', subtitle: 'Create your private career workbench' } },
+      }}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <ClerkQueryClientCacheInvalidator />
+          <Router />
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
+  );
+}
+
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <WouterRouter base={basePath}>
+      <ClerkProviderWithRoutes />
+    </WouterRouter>
   );
 }
 
