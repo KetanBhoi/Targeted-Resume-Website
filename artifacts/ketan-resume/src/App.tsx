@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
@@ -27,6 +27,7 @@ import { portfolio, type PortfolioSection } from '@/data/portfolio';
 import NotFound from '@/pages/not-found';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import WorkspacePage from '@/pages/workspace';
+import { createUserCacheInvalidator } from '@/lib/user-cache';
 
 const queryClient = new QueryClient();
 const clerkPubKey = publishableKeyFromHost(
@@ -707,18 +708,14 @@ function SignUpPage() {
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
   const queryClient = useQueryClient();
-  const previousUserId = useRef<string | null | undefined>(undefined);
+  const invalidateWhenUserChanges = useMemo(
+    () => createUserCacheInvalidator(() => queryClient.clear()),
+    [queryClient],
+  );
 
   useEffect(() => {
-    const unsubscribe = addListener(({ user }) => {
-      const userId = user?.id ?? null;
-      if (previousUserId.current !== undefined && previousUserId.current !== userId) {
-        queryClient.clear();
-      }
-      previousUserId.current = userId;
-    });
-    return unsubscribe;
-  }, [addListener, queryClient]);
+    return addListener(({ user }) => invalidateWhenUserChanges(user?.id ?? null));
+  }, [addListener, invalidateWhenUserChanges]);
 
   return null;
 }
