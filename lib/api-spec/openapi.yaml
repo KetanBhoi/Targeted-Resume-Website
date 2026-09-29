@@ -120,6 +120,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /workspace/export:
+    get:
+      operationId: exportWorkspaceData
+      tags: [workspace]
+      summary: Export the signed-in user's current workspace records
+      responses:
+        "200":
+          description: Fresh export of the signed-in user's records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceExport"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workspace/delete-all:
+    post:
+      operationId: deleteAllWorkspaceRecords
+      tags: [workspace]
+      summary: Atomically delete all records owned by the signed-in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceDeleteAllInput"
+      responses:
+        "200":
+          description: Number of records deleted for the signed-in user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceDeleteAllResult"
+        "400":
+          description: Exact deletion confirmation required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /workspace/records/{id}:
     patch:
       operationId: updateWorkspaceRecord
@@ -187,7 +235,7 @@ paths:
     post:
       operationId: generateWorkspaceContent
       tags: [workspace]
-      summary: Generate and save a match analysis or career preparation draft
+      summary: Generate and save analysis or career preparation content
       requestBody:
         required: true
         content:
@@ -200,7 +248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WorkspaceRecord"
+                $ref: "#/components/schemas/WorkspaceGenerationRecord"
         "400":
           description: Invalid generation request
           content:
@@ -221,6 +269,12 @@ paths:
                 $ref: "#/components/schemas/ApiError"
         "429":
           description: Generation rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: A linked record is missing, belongs to another user, or has the wrong kind
           content:
             application/json:
               schema:
@@ -263,7 +317,7 @@ components:
         - error
     WorkspaceRecordKind:
       type: string
-      enum: [resume, job, analysis, interview, cover-letter, linkedin]
+      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up]
     WorkspaceRecord:
       type: object
       properties:
@@ -276,8 +330,7 @@ components:
         content:
           type: string
         metadata:
-          type: object
-          additionalProperties: true
+          $ref: "#/components/schemas/WorkspaceRecordMetadata"
         createdAt:
           type: string
           format: date-time
@@ -285,6 +338,31 @@ components:
           type: string
           format: date-time
       required: [id, kind, title, content, metadata, createdAt, updatedAt]
+    WorkspaceExport:
+      type: object
+      properties:
+        exportedAt:
+          type: string
+          format: date-time
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkspaceRecord"
+      required: [exportedAt, records]
+    WorkspaceDeleteAllInput:
+      type: object
+      properties:
+        confirmation:
+          type: string
+          enum: ["DELETE ALL"]
+      required: [confirmation]
+    WorkspaceDeleteAllResult:
+      type: object
+      properties:
+        deletedCount:
+          type: integer
+          minimum: 0
+      required: [deletedCount]
     WorkspaceRecordInput:
       type: object
       properties:
@@ -298,8 +376,7 @@ components:
           type: string
           maxLength: 50000
         metadata:
-          type: object
-          additionalProperties: true
+          $ref: "#/components/schemas/WorkspaceRecordMetadata"
       required: [kind, title, content]
     WorkspaceRecordUpdate:
       type: object
@@ -312,14 +389,19 @@ components:
           type: string
           maxLength: 50000
         metadata:
-          type: object
-          additionalProperties: true
+          $ref: "#/components/schemas/WorkspaceRecordMetadata"
     WorkspaceGenerationInput:
       type: object
+      description: >
+        resumeText is required for all generation kinds except follow-up.
+        For resume-tailor, sourceResumeId and a job description are required.
+        For follow-up, sourceJobId is required. Supplied source IDs must
+        reference records owned by the authenticated user and of the expected kind.
+        questionCategory is only used for interviews; batchId is only used for analyses.
       properties:
         kind:
           type: string
-          enum: [analysis, interview, cover-letter, linkedin]
+          enum: [analysis, interview, cover-letter, linkedin, resume-tailor, follow-up]
         title:
           type: string
           minLength: 1
@@ -328,11 +410,251 @@ components:
           type: string
           minLength: 1
           maxLength: 20000
+          description: Required for every kind except follow-up.
         jobDescription:
           type: string
           maxLength: 20000
         instructions:
           type: string
           maxLength: 2000
-      required: [kind, title, resumeText]
+        sourceResumeId:
+          type: integer
+          minimum: 1
+          description: Optional link to a saved resume record owned by the signed-in user.
+        sourceJobId:
+          type: integer
+          minimum: 1
+          description: Optional link to a tracked job record owned by the signed-in user.
+        batchId:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Optional shared identifier for analyses in the same multi-job comparison.
+        questionCategory:
+          $ref: "#/components/schemas/WorkspaceInterviewQuestionCategory"
+      required: [kind, title]
+    WorkspaceRecordMetadata:
+      type: object
+      description: >
+        Extensible kind-specific data. Generated analysis, tailored resume,
+        follow-up, and interview records use their corresponding typed schemas.
+      additionalProperties: true
+    WorkspaceAnalysisMetadata:
+      type: object
+      properties:
+        fitScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+        strengths:
+          type: array
+          items:
+            type: string
+        skillGaps:
+          type: array
+          items:
+            type: string
+        atsIssues:
+          type: array
+          items:
+            type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        recommendation:
+          type: string
+        roadmap:
+          type: array
+          description: Actionable next steps for skills identified as missing from the resume.
+          items:
+            $ref: "#/components/schemas/WorkspaceRoadmapItem"
+        keywordHeatmap:
+          type: array
+          description: Deterministic, case-insensitive exact-term counts in the supplied job description and resume.
+          items:
+            $ref: "#/components/schemas/WorkspaceKeywordHeatmapEntry"
+        sourceResumeId:
+          type: integer
+          minimum: 1
+        sourceJobId:
+          type: integer
+          minimum: 1
+        batchId:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required: [fitScore, strengths, skillGaps, atsIssues, keywords, recommendation, roadmap, keywordHeatmap]
+    WorkspaceTailoredResumeMetadata:
+      type: object
+      description: Complete before/after document comparison for a tailored resume that must be reviewed before use.
+      properties:
+        sourceResumeId:
+          type: integer
+          minimum: 1
+        sourceJobId:
+          type: integer
+          minimum: 1
+        changes:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/WorkspaceResumeChange"
+        verificationStatus:
+          type: string
+          enum: [needs-review]
+      required: [sourceResumeId, changes, verificationStatus]
+    WorkspaceFollowUpMetadata:
+      type: object
+      description: Follow-up email subject, notes, and tracked application link.
+      properties:
+        subject:
+          type: string
+        notes:
+          type: array
+          items:
+            type: string
+        sourceJobId:
+          type: integer
+          minimum: 1
+        sourceResumeId:
+          type: integer
+          minimum: 1
+      required: [subject, notes, sourceJobId]
+    WorkspaceRoadmapItem:
+      type: object
+      properties:
+        skill:
+          type: string
+        requirement:
+          type: string
+        priority:
+          type: string
+          enum: [high, medium, low]
+        firstStep:
+          type: string
+      required: [skill, requirement, priority, firstStep]
+    WorkspaceInterviewQuestionCategory:
+      type: string
+      enum: [HR, Technical, Resume, JD, STAR]
+    WorkspaceInterviewQuestion:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/WorkspaceInterviewQuestionCategory"
+        question:
+          type: string
+        suggestedAnswerPoints:
+          type: array
+          minItems: 1
+          items:
+            type: string
+      required: [category, question, suggestedAnswerPoints]
+    WorkspaceInterviewMetadata:
+      type: object
+      properties:
+        questionCategory:
+          $ref: "#/components/schemas/WorkspaceInterviewQuestionCategory"
+        sourceResumeId:
+          type: integer
+          minimum: 1
+        sourceJobId:
+          type: integer
+          minimum: 1
+        questions:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/WorkspaceInterviewQuestion"
+        questionsToAsk:
+          type: array
+          items:
+            type: string
+      required: [questions, questionsToAsk]
+    WorkspaceKeywordHeatmapEntry:
+      type: object
+      properties:
+        term:
+          type: string
+        jdCount:
+          type: integer
+          minimum: 1
+        resumeCount:
+          type: integer
+          minimum: 0
+        status:
+          type: string
+          enum: [strong, partial, missing]
+          description: strong means resumeCount is at least jdCount; partial means resumeCount is positive but lower; missing means resumeCount is zero.
+      required: [term, jdCount, resumeCount, status]
+    WorkspaceResumeChange:
+      type: object
+      properties:
+        before:
+          type: string
+        after:
+          type: string
+        why:
+          type: string
+      required: [before, after, why]
+    WorkspaceGeneratedAnalysisRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind:
+              type: string
+              enum: [analysis]
+            metadata:
+              $ref: "#/components/schemas/WorkspaceAnalysisMetadata"
+          required: [kind, metadata]
+    WorkspaceGeneratedTailoredResumeRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind:
+              type: string
+              enum: [resume]
+            metadata:
+              $ref: "#/components/schemas/WorkspaceTailoredResumeMetadata"
+          required: [kind, metadata]
+    WorkspaceGeneratedFollowUpRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind:
+              type: string
+              enum: [follow-up]
+            metadata:
+              $ref: "#/components/schemas/WorkspaceFollowUpMetadata"
+          required: [kind, metadata]
+    WorkspaceGeneratedInterviewRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind:
+              type: string
+              enum: [interview]
+            metadata:
+              $ref: "#/components/schemas/WorkspaceInterviewMetadata"
+          required: [kind, metadata]
+    WorkspaceOtherGeneratedRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind:
+              type: string
+              enum: [cover-letter, linkedin]
+          required: [kind]
+    WorkspaceGenerationRecord:
+      oneOf:
+        - $ref: "#/components/schemas/WorkspaceGeneratedAnalysisRecord"
+        - $ref: "#/components/schemas/WorkspaceGeneratedTailoredResumeRecord"
+        - $ref: "#/components/schemas/WorkspaceGeneratedFollowUpRecord"
+        - $ref: "#/components/schemas/WorkspaceGeneratedInterviewRecord"
+        - $ref: "#/components/schemas/WorkspaceOtherGeneratedRecord"
 

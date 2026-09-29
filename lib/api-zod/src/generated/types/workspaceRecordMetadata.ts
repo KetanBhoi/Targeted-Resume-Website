@@ -6,4 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type WorkspaceRecordMetadata = { [key: string]: unknown };
+/**
+ * Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.
+ */
+export interface WorkspaceRecordMetadata { [key: string]: unknown }

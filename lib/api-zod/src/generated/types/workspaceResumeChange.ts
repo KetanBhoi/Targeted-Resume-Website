@@ -6,4 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type WorkspaceRecordInputMetadata = { [key: string]: unknown };
+export interface WorkspaceResumeChange {
+  before: string;
+  after: string;
+  why: string;
+}

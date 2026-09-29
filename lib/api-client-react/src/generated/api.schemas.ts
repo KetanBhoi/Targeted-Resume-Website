@@ -52,9 +52,13 @@ export const WorkspaceRecordKind = {
   interview: 'interview',
   'cover-letter': 'cover-letter',
   linkedin: 'linkedin',
+  'follow-up': 'follow-up',
 } as const;
 
-export type WorkspaceRecordMetadata = { [key: string]: unknown };
+/**
+ * Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.
+ */
+export interface WorkspaceRecordMetadata { [key: string]: unknown }
 
 export interface WorkspaceRecord {
   id: number;
@@ -66,7 +70,26 @@ export interface WorkspaceRecord {
   updatedAt: string;
 }
 
-export type WorkspaceRecordInputMetadata = { [key: string]: unknown };
+export interface WorkspaceExport {
+  exportedAt: string;
+  records: WorkspaceRecord[];
+}
+
+export type WorkspaceDeleteAllInputConfirmation = typeof WorkspaceDeleteAllInputConfirmation[keyof typeof WorkspaceDeleteAllInputConfirmation];
+
+
+export const WorkspaceDeleteAllInputConfirmation = {
+  DELETE_ALL: 'DELETE ALL',
+} as const;
+
+export interface WorkspaceDeleteAllInput {
+  confirmation: WorkspaceDeleteAllInputConfirmation;
+}
+
+export interface WorkspaceDeleteAllResult {
+  /** @minimum 0 */
+  deletedCount: number;
+}
 
 export interface WorkspaceRecordInput {
   kind: WorkspaceRecordKind;
@@ -77,10 +100,8 @@ export interface WorkspaceRecordInput {
   title: string;
   /** @maxLength 50000 */
   content: string;
-  metadata?: WorkspaceRecordInputMetadata;
+  metadata?: WorkspaceRecordMetadata;
 }
-
-export type WorkspaceRecordUpdateMetadata = { [key: string]: unknown };
 
 export interface WorkspaceRecordUpdate {
   /**
@@ -90,7 +111,7 @@ export interface WorkspaceRecordUpdate {
   title?: string;
   /** @maxLength 50000 */
   content?: string;
-  metadata?: WorkspaceRecordUpdateMetadata;
+  metadata?: WorkspaceRecordMetadata;
 }
 
 export type WorkspaceGenerationInputKind = typeof WorkspaceGenerationInputKind[keyof typeof WorkspaceGenerationInputKind];
@@ -101,8 +122,24 @@ export const WorkspaceGenerationInputKind = {
   interview: 'interview',
   'cover-letter': 'cover-letter',
   linkedin: 'linkedin',
+  'resume-tailor': 'resume-tailor',
+  'follow-up': 'follow-up',
 } as const;
 
+export type WorkspaceInterviewQuestionCategory = typeof WorkspaceInterviewQuestionCategory[keyof typeof WorkspaceInterviewQuestionCategory];
+
+
+export const WorkspaceInterviewQuestionCategory = {
+  HR: 'HR',
+  Technical: 'Technical',
+  Resume: 'Resume',
+  JD: 'JD',
+  STAR: 'STAR',
+} as const;
+
+/**
+ * resumeText is required for all generation kinds except follow-up. For resume-tailor, sourceResumeId and a job description are required. For follow-up, sourceJobId is required. Supplied source IDs must reference records owned by the authenticated user and of the expected kind. questionCategory is only used for interviews; batchId is only used for analyses.
+ */
 export interface WorkspaceGenerationInput {
   kind: WorkspaceGenerationInputKind;
   /**
@@ -111,15 +148,215 @@ export interface WorkspaceGenerationInput {
      */
   title: string;
   /**
+     * Required for every kind except follow-up.
      * @minLength 1
      * @maxLength 20000
      */
-  resumeText: string;
+  resumeText?: string;
   /** @maxLength 20000 */
   jobDescription?: string;
   /** @maxLength 2000 */
   instructions?: string;
+  /**
+     * Optional link to a saved resume record owned by the signed-in user.
+     * @minimum 1
+     */
+  sourceResumeId?: number;
+  /**
+     * Optional link to a tracked job record owned by the signed-in user.
+     * @minimum 1
+     */
+  sourceJobId?: number;
+  /**
+     * Optional shared identifier for analyses in the same multi-job comparison.
+     * @minLength 1
+     * @maxLength 100
+     */
+  batchId?: string;
+  questionCategory?: WorkspaceInterviewQuestionCategory;
 }
+
+export type WorkspaceRoadmapItemPriority = typeof WorkspaceRoadmapItemPriority[keyof typeof WorkspaceRoadmapItemPriority];
+
+
+export const WorkspaceRoadmapItemPriority = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+export interface WorkspaceRoadmapItem {
+  skill: string;
+  requirement: string;
+  priority: WorkspaceRoadmapItemPriority;
+  firstStep: string;
+}
+
+/**
+ * strong means resumeCount is at least jdCount; partial means resumeCount is positive but lower; missing means resumeCount is zero.
+ */
+export type WorkspaceKeywordHeatmapEntryStatus = typeof WorkspaceKeywordHeatmapEntryStatus[keyof typeof WorkspaceKeywordHeatmapEntryStatus];
+
+
+export const WorkspaceKeywordHeatmapEntryStatus = {
+  strong: 'strong',
+  partial: 'partial',
+  missing: 'missing',
+} as const;
+
+export interface WorkspaceKeywordHeatmapEntry {
+  term: string;
+  /** @minimum 1 */
+  jdCount: number;
+  /** @minimum 0 */
+  resumeCount: number;
+  /** strong means resumeCount is at least jdCount; partial means resumeCount is positive but lower; missing means resumeCount is zero. */
+  status: WorkspaceKeywordHeatmapEntryStatus;
+}
+
+export interface WorkspaceAnalysisMetadata {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  fitScore: number;
+  strengths: string[];
+  skillGaps: string[];
+  atsIssues: string[];
+  keywords: string[];
+  recommendation: string;
+  /** Actionable next steps for skills identified as missing from the resume. */
+  roadmap: WorkspaceRoadmapItem[];
+  /** Deterministic, case-insensitive exact-term counts in the supplied job description and resume. */
+  keywordHeatmap: WorkspaceKeywordHeatmapEntry[];
+  /** @minimum 1 */
+  sourceResumeId?: number;
+  /** @minimum 1 */
+  sourceJobId?: number;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  batchId?: string;
+}
+
+export type WorkspaceTailoredResumeMetadataVerificationStatus = typeof WorkspaceTailoredResumeMetadataVerificationStatus[keyof typeof WorkspaceTailoredResumeMetadataVerificationStatus];
+
+
+export const WorkspaceTailoredResumeMetadataVerificationStatus = {
+  'needs-review': 'needs-review',
+} as const;
+
+export interface WorkspaceResumeChange {
+  before: string;
+  after: string;
+  why: string;
+}
+
+/**
+ * Complete before/after document comparison for a tailored resume that must be reviewed before use.
+ */
+export interface WorkspaceTailoredResumeMetadata {
+  /** @minimum 1 */
+  sourceResumeId: number;
+  /** @minimum 1 */
+  sourceJobId?: number;
+  /** @minItems 1 */
+  changes: WorkspaceResumeChange[];
+  verificationStatus: WorkspaceTailoredResumeMetadataVerificationStatus;
+}
+
+/**
+ * Follow-up email subject, notes, and tracked application link.
+ */
+export interface WorkspaceFollowUpMetadata {
+  subject: string;
+  notes: string[];
+  /** @minimum 1 */
+  sourceJobId: number;
+  /** @minimum 1 */
+  sourceResumeId?: number;
+}
+
+export interface WorkspaceInterviewQuestion {
+  category: WorkspaceInterviewQuestionCategory;
+  question: string;
+  /** @minItems 1 */
+  suggestedAnswerPoints: string[];
+}
+
+export interface WorkspaceInterviewMetadata {
+  questionCategory?: WorkspaceInterviewQuestionCategory;
+  /** @minimum 1 */
+  sourceResumeId?: number;
+  /** @minimum 1 */
+  sourceJobId?: number;
+  /** @minItems 1 */
+  questions: WorkspaceInterviewQuestion[];
+  questionsToAsk: string[];
+}
+
+export type WorkspaceGeneratedAnalysisRecordKind = typeof WorkspaceGeneratedAnalysisRecordKind[keyof typeof WorkspaceGeneratedAnalysisRecordKind];
+
+
+export const WorkspaceGeneratedAnalysisRecordKind = {
+  analysis: 'analysis',
+} as const;
+
+export type WorkspaceGeneratedAnalysisRecord = WorkspaceRecord & {
+  kind: WorkspaceGeneratedAnalysisRecordKind;
+  metadata: WorkspaceAnalysisMetadata;
+};
+
+export type WorkspaceGeneratedTailoredResumeRecordKind = typeof WorkspaceGeneratedTailoredResumeRecordKind[keyof typeof WorkspaceGeneratedTailoredResumeRecordKind];
+
+
+export const WorkspaceGeneratedTailoredResumeRecordKind = {
+  resume: 'resume',
+} as const;
+
+export type WorkspaceGeneratedTailoredResumeRecord = WorkspaceRecord & {
+  kind: WorkspaceGeneratedTailoredResumeRecordKind;
+  metadata: WorkspaceTailoredResumeMetadata;
+};
+
+export type WorkspaceGeneratedFollowUpRecordKind = typeof WorkspaceGeneratedFollowUpRecordKind[keyof typeof WorkspaceGeneratedFollowUpRecordKind];
+
+
+export const WorkspaceGeneratedFollowUpRecordKind = {
+  'follow-up': 'follow-up',
+} as const;
+
+export type WorkspaceGeneratedFollowUpRecord = WorkspaceRecord & {
+  kind: WorkspaceGeneratedFollowUpRecordKind;
+  metadata: WorkspaceFollowUpMetadata;
+};
+
+export type WorkspaceGeneratedInterviewRecordKind = typeof WorkspaceGeneratedInterviewRecordKind[keyof typeof WorkspaceGeneratedInterviewRecordKind];
+
+
+export const WorkspaceGeneratedInterviewRecordKind = {
+  interview: 'interview',
+} as const;
+
+export type WorkspaceGeneratedInterviewRecord = WorkspaceRecord & {
+  kind: WorkspaceGeneratedInterviewRecordKind;
+  metadata: WorkspaceInterviewMetadata;
+};
+
+export type WorkspaceOtherGeneratedRecordKind = typeof WorkspaceOtherGeneratedRecordKind[keyof typeof WorkspaceOtherGeneratedRecordKind];
+
+
+export const WorkspaceOtherGeneratedRecordKind = {
+  'cover-letter': 'cover-letter',
+  linkedin: 'linkedin',
+} as const;
+
+export type WorkspaceOtherGeneratedRecord = WorkspaceRecord & {
+  kind: WorkspaceOtherGeneratedRecordKind;
+};
+
+export type WorkspaceGenerationRecord = WorkspaceGeneratedAnalysisRecord | WorkspaceGeneratedTailoredResumeRecord | WorkspaceGeneratedFollowUpRecord | WorkspaceGeneratedInterviewRecord | WorkspaceOtherGeneratedRecord;
 
 export type ListWorkspaceRecordsParams = {
 kind?: WorkspaceRecordKind;

@@ -14,4 +14,6 @@ export const WorkspaceGenerationInputKind = {
   interview: 'interview',
   'cover-letter': 'cover-letter',
   linkedin: 'linkedin',
+  'resume-tailor': 'resume-tailor',
+  'follow-up': 'follow-up',
 } as const;

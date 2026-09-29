@@ -39,15 +39,15 @@ export const AskAmbassadorResponse = zod.object({
  * @summary List the signed-in user's saved workspace records
  */
 export const ListWorkspaceRecordsQueryParams = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']).optional()
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']).optional()
 })
 
 export const ListWorkspaceRecordsResponseItem = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
   "title": zod.string(),
   "content": zod.string(),
-  "metadata": zod.record(zod.string(), zod.unknown()),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -64,20 +64,53 @@ export const createWorkspaceRecordBodyContentMax = 50000;
 
 
 export const CreateWorkspaceRecordBody = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
   "title": zod.string().min(1).max(createWorkspaceRecordBodyTitleMax),
   "content": zod.string().max(createWorkspaceRecordBodyContentMax),
-  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+  "metadata": zod.record(zod.string(), zod.unknown()).optional().describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n')
 })
 
 export const CreateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
   "title": zod.string(),
   "content": zod.string(),
-  "metadata": zod.record(zod.string(), zod.unknown()),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Export the signed-in user's current workspace records
+ */
+export const ExportWorkspaceDataResponse = zod.object({
+  "exportedAt": zod.coerce.date(),
+  "records": zod.array(zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Atomically delete all records owned by the signed-in user
+ */
+export const DeleteAllWorkspaceRecordsBody = zod.object({
+  "confirmation": zod.enum(['DELETE ALL'])
+})
+
+export const deleteAllWorkspaceRecordsResponseDeletedCountMin = 0;
+
+
+
+export const DeleteAllWorkspaceRecordsResponse = zod.object({
+  "deletedCount": zod.number().int().min(deleteAllWorkspaceRecordsResponseDeletedCountMin)
 })
 
 
@@ -100,15 +133,15 @@ export const updateWorkspaceRecordBodyContentMax = 50000;
 export const UpdateWorkspaceRecordBody = zod.object({
   "title": zod.string().min(1).max(updateWorkspaceRecordBodyTitleMax).optional(),
   "content": zod.string().max(updateWorkspaceRecordBodyContentMax).optional(),
-  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+  "metadata": zod.record(zod.string(), zod.unknown()).optional().describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n')
 })
 
 export const UpdateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
   "title": zod.string(),
   "content": zod.string(),
-  "metadata": zod.record(zod.string(), zod.unknown()),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -128,7 +161,7 @@ export const DeleteWorkspaceRecordResponse = zod.void()
 
 
 /**
- * @summary Generate and save a match analysis or career preparation draft
+ * @summary Generate and save analysis or career preparation content
  */
 export const generateWorkspaceContentBodyTitleMax = 160;
 
@@ -140,22 +173,143 @@ export const generateWorkspaceContentBodyInstructionsMax = 2000;
 
 
 
-export const GenerateWorkspaceContentBody = zod.object({
-  "kind": zod.enum(['analysis', 'interview', 'cover-letter', 'linkedin']),
-  "title": zod.string().min(1).max(generateWorkspaceContentBodyTitleMax),
-  "resumeText": zod.string().min(1).max(generateWorkspaceContentBodyResumeTextMax),
-  "jobDescription": zod.string().max(generateWorkspaceContentBodyJobDescriptionMax).optional(),
-  "instructions": zod.string().max(generateWorkspaceContentBodyInstructionsMax).optional()
-})
+export const generateWorkspaceContentBodyBatchIdMax = 100;
 
-export const GenerateWorkspaceContentResponse = zod.object({
+
+
+export const GenerateWorkspaceContentBody = zod.object({
+  "kind": zod.enum(['analysis', 'interview', 'cover-letter', 'linkedin', 'resume-tailor', 'follow-up']),
+  "title": zod.string().min(1).max(generateWorkspaceContentBodyTitleMax),
+  "resumeText": zod.string().min(1).max(generateWorkspaceContentBodyResumeTextMax).optional().describe('Required for every kind except follow-up.'),
+  "jobDescription": zod.string().max(generateWorkspaceContentBodyJobDescriptionMax).optional(),
+  "instructions": zod.string().max(generateWorkspaceContentBodyInstructionsMax).optional(),
+  "sourceResumeId": zod.number().int().min(1).optional().describe('Optional link to a saved resume record owned by the signed-in user.'),
+  "sourceJobId": zod.number().int().min(1).optional().describe('Optional link to a tracked job record owned by the signed-in user.'),
+  "batchId": zod.string().min(1).max(generateWorkspaceContentBodyBatchIdMax).optional().describe('Optional shared identifier for analyses in the same multi-job comparison.'),
+  "questionCategory": zod.enum(['HR', 'Technical', 'Resume', 'JD', 'STAR']).optional()
+}).describe('resumeText is required for all generation kinds except follow-up. For resume-tailor, sourceResumeId and a job description are required. For follow-up, sourceJobId is required. Supplied source IDs must reference records owned by the authenticated user and of the expected kind. questionCategory is only used for interviews; batchId is only used for analyses.\n')
+
+export const generateWorkspaceContentResponseOneTwoMetadataFitScoreMin = 0;
+export const generateWorkspaceContentResponseOneTwoMetadataFitScoreMax = 100;
+
+
+export const generateWorkspaceContentResponseOneTwoMetadataKeywordHeatmapItemResumeCountMin = 0;
+
+
+
+export const generateWorkspaceContentResponseOneTwoMetadataBatchIdMax = 100;
+
+
+
+
+
+
+
+
+
+
+
+
+export const GenerateWorkspaceContentResponse = zod.union([zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
   "title": zod.string(),
   "content": zod.string(),
-  "metadata": zod.record(zod.string(), zod.unknown()),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.enum(['analysis']),
+  "metadata": zod.object({
+  "fitScore": zod.number().int().min(generateWorkspaceContentResponseOneTwoMetadataFitScoreMin).max(generateWorkspaceContentResponseOneTwoMetadataFitScoreMax),
+  "strengths": zod.array(zod.string()),
+  "skillGaps": zod.array(zod.string()),
+  "atsIssues": zod.array(zod.string()),
+  "keywords": zod.array(zod.string()),
+  "recommendation": zod.string(),
+  "roadmap": zod.array(zod.object({
+  "skill": zod.string(),
+  "requirement": zod.string(),
+  "priority": zod.enum(['high', 'medium', 'low']),
+  "firstStep": zod.string()
+})).describe('Actionable next steps for skills identified as missing from the resume.'),
+  "keywordHeatmap": zod.array(zod.object({
+  "term": zod.string(),
+  "jdCount": zod.number().int().min(1),
+  "resumeCount": zod.number().int().min(generateWorkspaceContentResponseOneTwoMetadataKeywordHeatmapItemResumeCountMin),
+  "status": zod.enum(['strong', 'partial', 'missing']).describe('strong means resumeCount is at least jdCount; partial means resumeCount is positive but lower; missing means resumeCount is zero.')
+})).describe('Deterministic, case-insensitive exact-term counts in the supplied job description and resume.'),
+  "sourceResumeId": zod.number().int().min(1).optional(),
+  "sourceJobId": zod.number().int().min(1).optional(),
+  "batchId": zod.string().min(1).max(generateWorkspaceContentResponseOneTwoMetadataBatchIdMax).optional()
 })
+})),zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.enum(['resume']),
+  "metadata": zod.object({
+  "sourceResumeId": zod.number().int().min(1),
+  "sourceJobId": zod.number().int().min(1).optional(),
+  "changes": zod.array(zod.object({
+  "before": zod.string(),
+  "after": zod.string(),
+  "why": zod.string()
+})).min(1),
+  "verificationStatus": zod.enum(['needs-review'])
+}).describe('Complete before/after document comparison for a tailored resume that must be reviewed before use.')
+})),zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.enum(['follow-up']),
+  "metadata": zod.object({
+  "subject": zod.string(),
+  "notes": zod.array(zod.string()),
+  "sourceJobId": zod.number().int().min(1),
+  "sourceResumeId": zod.number().int().min(1).optional()
+}).describe('Follow-up email subject, notes, and tracked application link.')
+})),zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.enum(['interview']),
+  "metadata": zod.object({
+  "questionCategory": zod.enum(['HR', 'Technical', 'Resume', 'JD', 'STAR']).optional(),
+  "sourceResumeId": zod.number().int().min(1).optional(),
+  "sourceJobId": zod.number().int().min(1).optional(),
+  "questions": zod.array(zod.object({
+  "category": zod.enum(['HR', 'Technical', 'Resume', 'JD', 'STAR']),
+  "question": zod.string(),
+  "suggestedAnswerPoints": zod.array(zod.string()).min(1)
+})).min(1),
+  "questionsToAsk": zod.array(zod.string())
+})
+})),zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.enum(['cover-letter', 'linkedin'])
+}))])
 
 

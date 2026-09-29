@@ -5,7 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceRecordUpdateMetadata } from './workspaceRecordUpdateMetadata';
+import type { WorkspaceRecordMetadata } from './workspaceRecordMetadata';
 
 export interface WorkspaceRecordUpdate {
   /**
@@ -15,5 +15,5 @@ export interface WorkspaceRecordUpdate {
   title?: string;
   /** @maxLength 50000 */
   content?: string;
-  metadata?: WorkspaceRecordUpdateMetadata;
+  metadata?: WorkspaceRecordMetadata;
 }

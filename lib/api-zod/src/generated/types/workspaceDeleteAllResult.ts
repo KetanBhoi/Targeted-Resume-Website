@@ -6,4 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type WorkspaceRecordUpdateMetadata = { [key: string]: unknown };
+export interface WorkspaceDeleteAllResult {
+  /** @minimum 0 */
+  deletedCount: number;
+}

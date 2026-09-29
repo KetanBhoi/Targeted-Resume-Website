@@ -5,8 +5,8 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceRecordInputMetadata } from './workspaceRecordInputMetadata';
 import type { WorkspaceRecordKind } from './workspaceRecordKind';
+import type { WorkspaceRecordMetadata } from './workspaceRecordMetadata';
 
 export interface WorkspaceRecordInput {
   kind: WorkspaceRecordKind;
@@ -17,5 +17,5 @@ export interface WorkspaceRecordInput {
   title: string;
   /** @maxLength 50000 */
   content: string;
-  metadata?: WorkspaceRecordInputMetadata;
+  metadata?: WorkspaceRecordMetadata;
 }

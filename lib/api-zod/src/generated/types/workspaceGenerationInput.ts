@@ -6,7 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { WorkspaceGenerationInputKind } from './workspaceGenerationInputKind';
+import type { WorkspaceInterviewQuestionCategory } from './workspaceInterviewQuestionCategory';
 
+/**
+ * resumeText is required for all generation kinds except follow-up. For resume-tailor, sourceResumeId and a job description are required. For follow-up, sourceJobId is required. Supplied source IDs must reference records owned by the authenticated user and of the expected kind. questionCategory is only used for interviews; batchId is only used for analyses.
+ */
 export interface WorkspaceGenerationInput {
   kind: WorkspaceGenerationInputKind;
   /**
@@ -15,12 +19,30 @@ export interface WorkspaceGenerationInput {
      */
   title: string;
   /**
+     * Required for every kind except follow-up.
      * @minLength 1
      * @maxLength 20000
      */
-  resumeText: string;
+  resumeText?: string;
   /** @maxLength 20000 */
   jobDescription?: string;
   /** @maxLength 2000 */
   instructions?: string;
+  /**
+     * Optional link to a saved resume record owned by the signed-in user.
+     * @minimum 1
+     */
+  sourceResumeId?: number;
+  /**
+     * Optional link to a tracked job record owned by the signed-in user.
+     * @minimum 1
+     */
+  sourceJobId?: number;
+  /**
+     * Optional shared identifier for analyses in the same multi-job comparison.
+     * @minLength 1
+     * @maxLength 100
+     */
+  batchId?: string;
+  questionCategory?: WorkspaceInterviewQuestionCategory;
 }
