@@ -14,6 +14,7 @@ import {
   FileText,
   Github,
   Linkedin,
+  Mail,
   MessageCircle,
   Send,
   ShieldCheck,
@@ -512,7 +513,7 @@ function ContactStatus() {
           <div>
             <p className="font-mono-custom text-[10px] uppercase tracking-[0.15em]">{hasLinks ? 'Public links' : 'Publishing note'}</p>
             <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground" data-testid="text-contact-status">
-              {hasLinks ? 'Public profile links are available below.' : 'Public contact and profile links are not supplied yet. Add them before publishing this portfolio.'}
+              {hasLinks ? 'Public contact and profile links are available below.' : 'Public contact and profile links are not supplied yet. Add them before publishing this portfolio.'}
             </p>
           </div>
         </div>
@@ -520,6 +521,7 @@ function ContactStatus() {
           <div className="flex flex-wrap gap-3">
             {portfolio.publicLinks.linkedin && <a href={portfolio.publicLinks.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-linkedin"><Linkedin className="size-4" /> LinkedIn</a>}
             {portfolio.publicLinks.github && <a href={portfolio.publicLinks.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-github"><Github className="size-4" /> GitHub</a>}
+            {portfolio.publicContact && <a href={portfolio.publicContact.url} className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-email"><Mail className="size-4" /> {portfolio.publicContact.label}</a>}
           </div>
         )}
       </div>

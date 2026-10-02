@@ -130,11 +130,11 @@ export const portfolio = {
     "Introduction to Java",
   ],
   publicLinks: {
-    linkedin: null as string | null,
+    linkedin: "https://www.linkedin.com/in/ketan-bhoi-b591a5331" as string | null,
     github: null as string | null,
     additional: [] as { label: string; url: string }[],
   },
-  publicContact: null as { label: string; url: string } | null,
+  publicContact: { label: "Email", url: "mailto:kkbhoi09@gmail.com" } as { label: string; url: string } | null,
 };
 
 export type PortfolioSection =
