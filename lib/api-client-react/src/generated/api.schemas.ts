@@ -5,6 +5,73 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export type PortfolioFeedbackInputRoleView = typeof PortfolioFeedbackInputRoleView[keyof typeof PortfolioFeedbackInputRoleView];
+
+
+export const PortfolioFeedbackInputRoleView = {
+  recruiter: 'recruiter',
+  'hiring-manager': 'hiring-manager',
+  technical: 'technical',
+} as const;
+
+export type PortfolioFeedbackInputSignal = typeof PortfolioFeedbackInputSignal[keyof typeof PortfolioFeedbackInputSignal];
+
+
+export const PortfolioFeedbackInputSignal = {
+  'strong-fit': 'strong-fit',
+  explore: 'explore',
+  'needs-evidence': 'needs-evidence',
+} as const;
+
+export interface PortfolioFeedbackInput {
+  roleView: PortfolioFeedbackInputRoleView;
+  signal: PortfolioFeedbackInputSignal;
+  /**
+     * @minLength 10
+     * @maxLength 1200
+     */
+  message: string;
+  /**
+     * Anti-spam field; must be empty.
+     * @maxLength 120
+     */
+  website?: string;
+}
+
+export interface PortfolioFeedbackReceipt {
+  received: boolean;
+}
+
+export type PortfolioFeedbackRoleView = typeof PortfolioFeedbackRoleView[keyof typeof PortfolioFeedbackRoleView];
+
+
+export const PortfolioFeedbackRoleView = {
+  recruiter: 'recruiter',
+  'hiring-manager': 'hiring-manager',
+  technical: 'technical',
+} as const;
+
+export type PortfolioFeedbackSignal = typeof PortfolioFeedbackSignal[keyof typeof PortfolioFeedbackSignal];
+
+
+export const PortfolioFeedbackSignal = {
+  'strong-fit': 'strong-fit',
+  explore: 'explore',
+  'needs-evidence': 'needs-evidence',
+} as const;
+
+export interface PortfolioFeedback {
+  id: number;
+  roleView: PortfolioFeedbackRoleView;
+  signal: PortfolioFeedbackSignal;
+  message: string;
+  createdAt: string;
+}
+
+export interface PortfolioOwnerAccess {
+  isOwner: boolean;
+}
+
 export interface HealthStatus {
   status: string;
 }

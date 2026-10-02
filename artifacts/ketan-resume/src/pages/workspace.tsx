@@ -11,6 +11,7 @@ import {
   Clock3,
   Copy,
   Download,
+  ExternalLink,
   FileText,
   FlaskConical,
   GitCompareArrows,
@@ -18,6 +19,7 @@ import {
   Link2,
   LogOut,
   Menu,
+  MessageCircle,
   Plus,
   RefreshCw,
   Search,
@@ -42,6 +44,9 @@ import {
   type WorkspaceRecordKind,
 } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useGetPortfolioOwnerAccess } from '@workspace/api-client-react';
+import InterviewStudio from '@/pages/interview-studio';
+import PortfolioInsights from '@/pages/portfolio-insights';
 import { Link, useLocation } from 'wouter';
 import {
   buildKeywordPreview,
@@ -53,11 +58,13 @@ import {
   readKeywordHeatmap,
 } from '@/lib/workspace-features';
 
-type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare';
+type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare' | 'studio' | 'insights';
 type Meta = Record<string, unknown>;
 type RecordKind = WorkspaceRecordKind;
 
 const viewCopy: Record<WorkspaceView, { eyebrow: string; title: string; description: string }> = {
+  studio: { eyebrow: 'Interview studio', title: 'Practice with a clear timer.', description: 'Local drafts and optional audio, with no uploads.' },
+  insights: { eyebrow: 'Owner insights', title: 'See what recruiters noticed.', description: 'Private feedback and portfolio analytics.' },
   overview: {
     eyebrow: 'Private career workbench',
     title: 'Keep the signal close.',
@@ -85,9 +92,13 @@ const navItems: { label: string; hint: string; href: string; view: WorkspaceView
   { label: 'Applications', hint: 'Roles + reminders', href: '/workspace/jobs', view: 'jobs', icon: BriefcaseBusiness },
   { label: 'Role match', hint: 'ATS + skill gaps', href: '/workspace/match', view: 'match', icon: BarChart3 },
   { label: 'Prepare', hint: 'Answers + writing', href: '/workspace/prepare', view: 'prepare', icon: Sparkles },
+  { label: 'Interview studio', hint: 'Timed + local practice', href: '/workspace/studio', view: 'studio', icon: MessageCircle },
+  { label: 'Portfolio insights', hint: 'Owner-only feedback', href: '/workspace/insights', view: 'insights', icon: BarChart3 },
 ];
 
 function getView(path: string): WorkspaceView {
+  if (path.includes('/studio')) return 'studio';
+  if (path.includes('/insights')) return 'insights';
   if (path.includes('/jobs')) return 'jobs';
   if (path.includes('/match')) return 'match';
   if (path.includes('/prepare')) return 'prepare';
@@ -257,6 +268,7 @@ function KeywordHeatmap({ items }: { items: ReturnType<typeof readKeywordHeatmap
 }
 
 function WorkspaceSidebar({ view, onClose }: { view: WorkspaceView; onClose: () => void }) {
+  const owner = useGetPortfolioOwnerAccess();
   const { user } = useUser();
   const { signOut } = useClerk();
   const initials = (user?.firstName?.[0] ?? user?.primaryEmailAddress?.emailAddress?.[0] ?? 'K').toUpperCase();
@@ -277,7 +289,7 @@ function WorkspaceSidebar({ view, onClose }: { view: WorkspaceView; onClose: () 
 
       <div className="workspace-sidebar-label">Workspace</div>
       <nav className="workspace-nav" aria-label="Workspace navigation">
-        {navItems.map((item) => {
+        {navItems.filter((item) => item.view !== 'insights' || owner.data?.isOwner).map((item) => {
           const Icon = item.icon;
           return (
             <Link
@@ -294,6 +306,7 @@ function WorkspaceSidebar({ view, onClose }: { view: WorkspaceView; onClose: () 
           );
         })}
       </nav>
+      <Link href="/portfolio" className="workspace-nav-link" onClick={onClose} data-testid="link-public-portfolio"><ExternalLink size={17} /><span><strong>Public portfolio</strong><small>Preview recruiter views</small></span></Link>
 
       <div className="workspace-sidebar-rule" />
       <div className="workspace-sidebar-note">
@@ -1315,7 +1328,7 @@ export default function WorkspacePage() {
     <div className="workspace-shell">
       <div className={`workspace-sidebar-wrap ${sidebarOpen ? 'workspace-sidebar-wrap-open' : ''}`}><WorkspaceSidebar view={view} onClose={() => setSidebarOpen(false)} /></div>
       {sidebarOpen && <button className="workspace-sidebar-overlay" type="button" onClick={() => setSidebarOpen(false)} aria-label="Close navigation" data-testid="button-close-sidebar-overlay" />}
-      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}</main></div>
+      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}{view === 'studio' && <InterviewStudio />}{view === 'insights' && <PortfolioInsights />}</main></div>
     </div>
   );
 }

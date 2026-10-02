@@ -29,6 +29,10 @@ import NotFound from '@/pages/not-found';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import WorkspacePage from '@/pages/workspace';
 import { createUserCacheInvalidator } from '@/lib/user-cache';
+import { RecruiterTools, RecruiterFeedback } from '@/components/recruiter-tools';
+import RecruiterBrief from '@/pages/recruiter-brief';
+import { readPortfolioView, type PortfolioView } from '@/lib/portfolio-view';
+import { trackEvent } from '@/lib/analytics';
 
 const queryClient = new QueryClient();
 const clerkPubKey = publishableKeyFromHost(
@@ -157,6 +161,8 @@ function Header({ onDownload }: { onDownload: () => void }) {
             </a>
           ))}
         </nav>
+        <div className="flex items-center gap-3">
+        <a href={`${basePath}/workspace`} className="font-mono-custom text-[10px] uppercase tracking-[0.1em]" data-testid="link-private-workspace">Private workspace</a>
         <button
           type="button"
           onClick={onDownload}
@@ -167,6 +173,7 @@ function Header({ onDownload }: { onDownload: () => void }) {
           <span className="hidden sm:inline">Download resume</span>
           <span className="sm:hidden">Resume</span>
         </button>
+        </div>
       </div>
     </header>
   );
@@ -404,6 +411,7 @@ function Ambassador() {
       { data: { question: trimmed } },
       {
         onSuccess: (answer) => {
+          trackEvent('ambassador_answered', { section: answer.section ?? 'unsupported' });
           setMessages((current) => [...current, { role: 'assistant', text: answer.answer, section: answer.section }]);
         },
         onError: () => {
@@ -519,9 +527,9 @@ function ContactStatus() {
         </div>
         {hasLinks && (
           <div className="flex flex-wrap gap-3">
-            {portfolio.publicLinks.linkedin && <a href={portfolio.publicLinks.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-linkedin"><Linkedin className="size-4" /> LinkedIn</a>}
+             {portfolio.publicLinks.linkedin && <a href={portfolio.publicLinks.linkedin} onClick={() => trackEvent('contact_clicked', { channel: 'linkedin' })} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-linkedin"><Linkedin className="size-4" /> LinkedIn</a>}
             {portfolio.publicLinks.github && <a href={portfolio.publicLinks.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-github"><Github className="size-4" /> GitHub</a>}
-            {portfolio.publicContact && <a href={portfolio.publicContact.url} className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-email"><Mail className="size-4" /> {portfolio.publicContact.label}</a>}
+             {portfolio.publicContact && <a href={portfolio.publicContact.url} onClick={() => trackEvent('contact_clicked', { channel: 'email' })} className="inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-sm font-bold" data-testid="link-email"><Mail className="size-4" /> {portfolio.publicContact.label}</a>}
           </div>
         )}
       </div>
@@ -539,6 +547,7 @@ function Footer() {
 }
 
 function downloadResume() {
+  trackEvent('resume_downloaded');
   const resumeRows = [
     { text: portfolio.positioning, size: 10, leading: 15 },
     { text: '', size: 10, leading: 6 },
@@ -586,7 +595,8 @@ function downloadResume() {
       leading: 14,
     })),
     { text: '', size: 10, leading: 6 },
-    { text: 'Public contact and profile links: not supplied yet.', size: 8, leading: 12 },
+    { text: `LinkedIn: ${portfolio.publicLinks.linkedin ?? 'Not supplied'}`, size: 8, leading: 12 },
+    { text: `Email: ${portfolio.publicContact?.url.replace('mailto:', '') ?? 'Not supplied'}`, size: 8, leading: 12 },
   ];
   const ascii = (text: string) =>
     text
@@ -660,16 +670,40 @@ function downloadResume() {
 }
 
 function Home() {
+  const [view, setView] = useState<PortfolioView>(readPortfolioView);
+  const changeView = (next: PortfolioView) => {
+    setView(next);
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', next);
+    window.history.replaceState(window.history.state, '', url);
+    trackEvent('role_view_changed', { view: next });
+  };
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) if (entry.isIntersecting) {
+        trackEvent('section_viewed', { section: entry.target.id, view });
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.1 });
+    for (const id of ['about', 'role-fit', 'experience', 'projects', 'skills', 'education', 'ambassador']) {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    }
+    return () => observer.disconnect();
+  }, [view]);
   return (
     <div className="site-shell min-h-[100dvh] bg-background">
       <Header onDownload={downloadResume} />
       <main>
+        <RecruiterTools view={view} onViewChange={changeView} />
         <Hero onDownload={downloadResume} />
-        <RoleFit />
-        <Experience />
-        <Skills />
+        {view === 'recruiter' && <><RoleFit /><Experience /><Skills /></>}
+        {view === 'hiring-manager' && <><Experience /><RoleFit /><Skills /></>}
+        {view === 'technical' && <><Skills /><Experience /><RoleFit /></>}
         <Education />
         <Ambassador />
+        <RecruiterFeedback view={view} />
         <ContactStatus />
       </main>
       <Footer />
@@ -686,7 +720,7 @@ function HomeRedirect() {
 function ProtectedWorkspace() {
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded) return <div className="auth-loading" aria-label="Loading workspace" />;
-  return isSignedIn ? <WorkspacePage /> : <Redirect to="/" />;
+  return isSignedIn ? <WorkspacePage /> : <Redirect to="/sign-in" />;
 }
 
 function SignInPage() {
@@ -727,12 +761,16 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={HomeRedirect} />
+        <Route path="/portfolio" component={Home} />
+        <Route path="/brief" component={RecruiterBrief} />
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/workspace" component={ProtectedWorkspace} />
         <Route path="/workspace/jobs" component={ProtectedWorkspace} />
         <Route path="/workspace/match" component={ProtectedWorkspace} />
         <Route path="/workspace/prepare" component={ProtectedWorkspace} />
+        <Route path="/workspace/studio" component={ProtectedWorkspace} />
+        <Route path="/workspace/insights" component={ProtectedWorkspace} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>

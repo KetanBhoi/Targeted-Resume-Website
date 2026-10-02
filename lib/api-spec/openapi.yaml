@@ -15,6 +15,88 @@ tags:
   - name: workspace
     description: Private candidate workspace records and preparation tools
 paths:
+  /portfolio/feedback:
+    post:
+      operationId: submitPortfolioFeedback
+      tags: [portfolio]
+      summary: Send a private recruiter note to the portfolio owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PortfolioFeedbackInput"
+      responses:
+        "201":
+          description: Note received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioFeedbackReceipt"
+        "400":
+          description: Invalid note
+        "429":
+          description: Too many submissions
+        "503":
+          description: Feedback is temporarily unavailable
+    get:
+      operationId: listPortfolioFeedback
+      tags: [portfolio]
+      summary: List the newest 100 notes, only for the verified portfolio owner
+      responses:
+        "200":
+          description: Private feedback
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PortfolioFeedback"
+        "401":
+          description: Sign in required
+        "403":
+          description: Owner access required
+        "503":
+          description: Feedback unavailable
+  /portfolio/owner-access:
+    get:
+      operationId: getPortfolioOwnerAccess
+      tags: [portfolio]
+      summary: Check the signed-in account against the verified owner email
+      responses:
+        "200":
+          description: Access result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioOwnerAccess"
+        "401":
+          description: Sign in required
+        "503":
+          description: Owner check unavailable
+  /portfolio/feedback/{id}:
+    delete:
+      operationId: deletePortfolioFeedback
+      tags: [portfolio]
+      summary: Delete a note, only for the verified portfolio owner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Sign in required
+        "403":
+          description: Owner access required
+        "404":
+          description: Note not found
+        "503":
+          description: Feedback unavailable
   /healthz:
     get:
       operationId: healthCheck
@@ -281,6 +363,53 @@ paths:
                 $ref: "#/components/schemas/ApiError"
 components:
   schemas:
+    PortfolioFeedbackInput:
+      type: object
+      properties:
+        roleView:
+          type: string
+          enum: [recruiter, hiring-manager, technical]
+        signal:
+          type: string
+          enum: [strong-fit, explore, needs-evidence]
+        message:
+          type: string
+          minLength: 10
+          maxLength: 1200
+        website:
+          type: string
+          maxLength: 120
+          description: Anti-spam field; must be empty.
+      required: [roleView, signal, message]
+    PortfolioFeedbackReceipt:
+      type: object
+      properties:
+        received:
+          type: boolean
+      required: [received]
+    PortfolioFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+        roleView:
+          type: string
+          enum: [recruiter, hiring-manager, technical]
+        signal:
+          type: string
+          enum: [strong-fit, explore, needs-evidence]
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, roleView, signal, message, createdAt]
+    PortfolioOwnerAccess:
+      type: object
+      properties:
+        isOwner:
+          type: boolean
+      required: [isOwner]
     HealthStatus:
       type: object
       properties:

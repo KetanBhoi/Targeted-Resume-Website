@@ -120,7 +120,7 @@ export function buildKeywordPreview(jobDescription: string, resumeText: string):
       const resumeCount = countOccurrences(resumeLower, term);
       const relatedFormExists = !resumeCount && term.length >= 5
         && (resumeLower.match(/[a-z][a-z0-9+#./-]*/g) ?? [])
-          .some((candidate) => candidate.startsWith(term.slice(0, -1)) || term.startsWith(candidate.slice(0, -1)));
+          .some((candidate: string) => candidate.startsWith(term.slice(0, -1)) || term.startsWith(candidate.slice(0, -1)));
       const status = resumeCount >= jobCount ? 'strong' : resumeCount > 0 || relatedFormExists ? 'partial' : 'missing';
       return { term, jobCount, resumeCount, status };
     });

@@ -9,6 +9,62 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Send a private recruiter note to the portfolio owner
+ */
+export const submitPortfolioFeedbackBodyMessageMin = 10;
+export const submitPortfolioFeedbackBodyMessageMax = 1200;
+
+export const submitPortfolioFeedbackBodyWebsiteMax = 120;
+
+
+
+export const SubmitPortfolioFeedbackBody = zod.object({
+  "roleView": zod.enum(['recruiter', 'hiring-manager', 'technical']),
+  "signal": zod.enum(['strong-fit', 'explore', 'needs-evidence']),
+  "message": zod.string().min(submitPortfolioFeedbackBodyMessageMin).max(submitPortfolioFeedbackBodyMessageMax),
+  "website": zod.string().max(submitPortfolioFeedbackBodyWebsiteMax).optional().describe('Anti-spam field; must be empty.')
+})
+
+export const SubmitPortfolioFeedbackResponse = zod.object({
+  "received": zod.boolean()
+})
+
+
+/**
+ * @summary List the newest 100 notes, only for the verified portfolio owner
+ */
+export const ListPortfolioFeedbackResponseItem = zod.object({
+  "id": zod.number().int(),
+  "roleView": zod.enum(['recruiter', 'hiring-manager', 'technical']),
+  "signal": zod.enum(['strong-fit', 'explore', 'needs-evidence']),
+  "message": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPortfolioFeedbackResponse = zod.array(ListPortfolioFeedbackResponseItem)
+
+
+/**
+ * @summary Check the signed-in account against the verified owner email
+ */
+export const GetPortfolioOwnerAccessResponse = zod.object({
+  "isOwner": zod.boolean()
+})
+
+
+/**
+ * @summary Delete a note, only for the verified portfolio owner
+ */
+
+
+
+export const DeletePortfolioFeedbackParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const DeletePortfolioFeedbackResponse = zod.void()
+
+
+/**
  * Returns server health status
  * @summary Health check
  */

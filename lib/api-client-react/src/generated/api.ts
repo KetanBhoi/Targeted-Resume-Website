@@ -25,6 +25,10 @@ import type {
   ApiError,
   HealthStatus,
   ListWorkspaceRecordsParams,
+  PortfolioFeedback,
+  PortfolioFeedbackInput,
+  PortfolioFeedbackReceipt,
+  PortfolioOwnerAccess,
   WorkspaceDeleteAllInput,
   WorkspaceDeleteAllResult,
   WorkspaceExport,
@@ -61,6 +65,322 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getSubmitPortfolioFeedbackUrl = () => {
+
+
+
+
+  return `/api/portfolio/feedback`
+}
+
+/**
+ * @summary Send a private recruiter note to the portfolio owner
+ */
+export const submitPortfolioFeedback = async (portfolioFeedbackInput: PortfolioFeedbackInput, options?: Parameters<typeof customFetch>[1]): Promise<PortfolioFeedbackReceipt> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortfolioFeedbackReceipt>(getSubmitPortfolioFeedbackUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portfolioFeedbackInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitPortfolioFeedbackMutationKey = () => ['submitPortfolioFeedback'] as const;
+
+export const getSubmitPortfolioFeedbackMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitPortfolioFeedback>>, TError,SubmitPortfolioFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitPortfolioFeedback>>, TError,SubmitPortfolioFeedbackMutationVariables, TContext> => {
+
+const mutationKey = getSubmitPortfolioFeedbackMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitPortfolioFeedback>>, SubmitPortfolioFeedbackMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitPortfolioFeedback(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitPortfolioFeedbackMutationResult = NonNullable<Awaited<ReturnType<typeof submitPortfolioFeedback>>>
+    export type SubmitPortfolioFeedbackMutationBody = BodyType<PortfolioFeedbackInput>
+    export type SubmitPortfolioFeedbackMutationError = ErrorType<void>
+    export type SubmitPortfolioFeedbackMutationVariables = {data: BodyType<PortfolioFeedbackInput>}
+
+    /**
+ * @summary Send a private recruiter note to the portfolio owner
+ */
+export const useSubmitPortfolioFeedback = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitPortfolioFeedback>>, TError,SubmitPortfolioFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitPortfolioFeedback>>,
+        TError,
+        SubmitPortfolioFeedbackMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitPortfolioFeedbackMutationOptions(options));
+    }
+
+export const getListPortfolioFeedbackUrl = () => {
+
+
+
+
+  return `/api/portfolio/feedback`
+}
+
+/**
+ * @summary List the newest 100 notes, only for the verified portfolio owner
+ */
+export const listPortfolioFeedback = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortfolioFeedback[]> => {
+
+  return customFetch<PortfolioFeedback[]>(getListPortfolioFeedbackUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPortfolioFeedbackQueryKey = () => {
+    return [
+    `/api/portfolio/feedback`
+    ] as const;
+    }
+
+
+export const getListPortfolioFeedbackQueryOptions = <TData = Awaited<ReturnType<typeof listPortfolioFeedback>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPortfolioFeedback>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPortfolioFeedbackQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPortfolioFeedback>>> = ({ signal }) => listPortfolioFeedback({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPortfolioFeedback>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPortfolioFeedbackQueryResult = NonNullable<Awaited<ReturnType<typeof listPortfolioFeedback>>>
+export type ListPortfolioFeedbackQueryError = ErrorType<void>
+
+
+/**
+ * @summary List the newest 100 notes, only for the verified portfolio owner
+ */
+
+export function useListPortfolioFeedback<TData = Awaited<ReturnType<typeof listPortfolioFeedback>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPortfolioFeedback>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPortfolioFeedbackQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPortfolioOwnerAccessUrl = () => {
+
+
+
+
+  return `/api/portfolio/owner-access`
+}
+
+/**
+ * @summary Check the signed-in account against the verified owner email
+ */
+export const getPortfolioOwnerAccess = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortfolioOwnerAccess> => {
+
+  return customFetch<PortfolioOwnerAccess>(getGetPortfolioOwnerAccessUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPortfolioOwnerAccessQueryKey = () => {
+    return [
+    `/api/portfolio/owner-access`
+    ] as const;
+    }
+
+
+export const getGetPortfolioOwnerAccessQueryOptions = <TData = Awaited<ReturnType<typeof getPortfolioOwnerAccess>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPortfolioOwnerAccess>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPortfolioOwnerAccessQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPortfolioOwnerAccess>>> = ({ signal }) => getPortfolioOwnerAccess({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPortfolioOwnerAccess>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPortfolioOwnerAccessQueryResult = NonNullable<Awaited<ReturnType<typeof getPortfolioOwnerAccess>>>
+export type GetPortfolioOwnerAccessQueryError = ErrorType<void>
+
+
+/**
+ * @summary Check the signed-in account against the verified owner email
+ */
+
+export function useGetPortfolioOwnerAccess<TData = Awaited<ReturnType<typeof getPortfolioOwnerAccess>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPortfolioOwnerAccess>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPortfolioOwnerAccessQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDeletePortfolioFeedbackUrl = (id: number,) => {
+
+
+
+
+  return `/api/portfolio/feedback/${id}`
+}
+
+/**
+ * @summary Delete a note, only for the verified portfolio owner
+ */
+export const deletePortfolioFeedback = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeletePortfolioFeedbackUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeletePortfolioFeedbackMutationKey = () => ['deletePortfolioFeedback'] as const;
+
+export const getDeletePortfolioFeedbackMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePortfolioFeedback>>, TError,DeletePortfolioFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePortfolioFeedback>>, TError,DeletePortfolioFeedbackMutationVariables, TContext> => {
+
+const mutationKey = getDeletePortfolioFeedbackMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePortfolioFeedback>>, DeletePortfolioFeedbackMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deletePortfolioFeedback(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePortfolioFeedbackMutationResult = NonNullable<Awaited<ReturnType<typeof deletePortfolioFeedback>>>
+
+    export type DeletePortfolioFeedbackMutationError = ErrorType<void>
+    export type DeletePortfolioFeedbackMutationVariables = {id: number}
+
+    /**
+ * @summary Delete a note, only for the verified portfolio owner
+ */
+export const useDeletePortfolioFeedback = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePortfolioFeedback>>, TError,DeletePortfolioFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deletePortfolioFeedback>>,
+        TError,
+        DeletePortfolioFeedbackMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeletePortfolioFeedbackMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 
