@@ -1,36 +1,20 @@
-import { clerkClient, getAuth } from "@clerk/express";
 import { SubmitPortfolioFeedbackBody, DeletePortfolioFeedbackParams } from "@workspace/api-zod";
 import { db, portfolioFeedbackTable } from "@workspace/db";
 import { count, desc, eq, gte, sql } from "drizzle-orm";
-import { Router, type IRouter, type Request, type Response } from "express";
-import { hasVerifiedOwnerEmail } from "../lib/portfolio-owner";
+import { Router, type IRouter } from "express";
+import { requirePortfolioOwner } from "../lib/require-portfolio-owner";
 
 const router: IRouter = Router();
 const limits = new Map<string, { count: number; until: number }>();
 const hour = 3_600_000;
 
-async function checkOwner(req: Request, res: Response): Promise<boolean | null> {
-  res.setHeader("Cache-Control", "no-store");
-  const userId = getAuth(req).userId;
-  if (!userId) { res.status(401).json({ error: "Sign in required." }); return null; }
-  if (!process.env.PORTFOLIO_OWNER_EMAIL?.trim()) {
-    res.status(503).json({ error: "Owner access is not configured." }); return null;
-  }
-  try {
-    const user = await clerkClient.users.getUser(userId);
-    return hasVerifiedOwnerEmail(user.emailAddresses, process.env.PORTFOLIO_OWNER_EMAIL);
-  } catch {
-    res.status(503).json({ error: "Unable to verify owner access. Try again later." }); return null;
-  }
-}
-
 router.get("/portfolio/owner-access", async (req, res) => {
-  const isOwner = await checkOwner(req, res);
+  const isOwner = await requirePortfolioOwner(req, res);
   if (isOwner !== null) res.json({ isOwner });
 });
 
 router.get("/portfolio/feedback", async (req, res) => {
-  const isOwner = await checkOwner(req, res);
+  const isOwner = await requirePortfolioOwner(req, res);
   if (isOwner === null) return;
   if (!isOwner) { res.status(403).json({ error: "Only the verified portfolio owner can read feedback." }); return; }
   try {
@@ -81,7 +65,7 @@ router.post("/portfolio/feedback", async (req, res) => {
 });
 
 router.delete("/portfolio/feedback/:id", async (req, res) => {
-  const isOwner = await checkOwner(req, res);
+  const isOwner = await requirePortfolioOwner(req, res);
   if (isOwner === null) return;
   if (!isOwner) { res.status(403).json({ error: "Only the verified portfolio owner can delete feedback." }); return; }
   const parsed = DeletePortfolioFeedbackParams.safeParse(req.params);

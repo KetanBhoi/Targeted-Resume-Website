@@ -9,6 +9,352 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Get only approved, published portfolio content
+ */
+export const getPublicPortfolioContentResponseOneBookingEnabledDefault = false;
+export const getPublicPortfolioContentResponseOneBookingUrlDefault = ``;
+export const getPublicPortfolioContentResponseOneBookingUrlMax = 2048;
+
+export const getPublicPortfolioContentResponseOneBookingTimezoneDefault = `Asia/Kolkata`;
+export const getPublicPortfolioContentResponseOneBookingTimezoneMax = 100;
+
+export const getPublicPortfolioContentResponseOneBookingAvailabilityDefault = ``;
+export const getPublicPortfolioContentResponseOneBookingAvailabilityMax = 2000;
+
+export const getPublicPortfolioContentResponseOneAvailabilityPublishedDefault = false;
+export const getPublicPortfolioContentResponseOneAvailabilityRolesDefault = ``;
+export const getPublicPortfolioContentResponseOneAvailabilityRolesMax = 2000;
+
+export const getPublicPortfolioContentResponseOneAvailabilityWorkArrangementDefault = ``;
+export const getPublicPortfolioContentResponseOneAvailabilityWorkArrangementMax = 1000;
+
+export const getPublicPortfolioContentResponseOneAvailabilityLocationsDefault = ``;
+export const getPublicPortfolioContentResponseOneAvailabilityLocationsMax = 1000;
+
+export const getPublicPortfolioContentResponseOneAvailabilityJoiningDefault = ``;
+export const getPublicPortfolioContentResponseOneAvailabilityJoiningMax = 1000;
+
+export const getPublicPortfolioContentResponseOneCertificatesItemIdMax = 100;
+
+export const getPublicPortfolioContentResponseOneCertificatesItemTitleMax = 200;
+
+export const getPublicPortfolioContentResponseOneCertificatesItemIssuerMax = 200;
+
+export const getPublicPortfolioContentResponseOneCertificatesItemCompletedMax = 10;
+
+export const getPublicPortfolioContentResponseOneCertificatesItemVerificationUrlMax = 2048;
+
+export const getPublicPortfolioContentResponseOneCertificatesDefault = [];
+export const getPublicPortfolioContentResponseOneCertificatesMax = 30;
+
+export const getPublicPortfolioContentResponseOneRecommendationsItemIdMax = 100;
+
+export const getPublicPortfolioContentResponseOneRecommendationsItemAuthorMax = 160;
+
+export const getPublicPortfolioContentResponseOneRecommendationsItemRelationshipMax = 160;
+
+export const getPublicPortfolioContentResponseOneRecommendationsItemTextMax = 3000;
+
+export const getPublicPortfolioContentResponseOneRecommendationsDefault = [];
+export const getPublicPortfolioContentResponseOneRecommendationsMax = 30;
+
+
+
+export const GetPublicPortfolioContentResponse = zod.object({
+  "booking": zod.object({
+  "enabled": zod.boolean().default(getPublicPortfolioContentResponseOneBookingEnabledDefault),
+  "url": zod.string().max(getPublicPortfolioContentResponseOneBookingUrlMax).default(getPublicPortfolioContentResponseOneBookingUrlDefault),
+  "timezone": zod.string().min(1).max(getPublicPortfolioContentResponseOneBookingTimezoneMax).default(getPublicPortfolioContentResponseOneBookingTimezoneDefault),
+  "availability": zod.string().max(getPublicPortfolioContentResponseOneBookingAvailabilityMax).default(getPublicPortfolioContentResponseOneBookingAvailabilityDefault)
+}),
+  "availability": zod.object({
+  "published": zod.boolean().default(getPublicPortfolioContentResponseOneAvailabilityPublishedDefault),
+  "roles": zod.string().max(getPublicPortfolioContentResponseOneAvailabilityRolesMax).default(getPublicPortfolioContentResponseOneAvailabilityRolesDefault),
+  "workArrangement": zod.string().max(getPublicPortfolioContentResponseOneAvailabilityWorkArrangementMax).default(getPublicPortfolioContentResponseOneAvailabilityWorkArrangementDefault),
+  "locations": zod.string().max(getPublicPortfolioContentResponseOneAvailabilityLocationsMax).default(getPublicPortfolioContentResponseOneAvailabilityLocationsDefault),
+  "joining": zod.string().max(getPublicPortfolioContentResponseOneAvailabilityJoiningMax).default(getPublicPortfolioContentResponseOneAvailabilityJoiningDefault)
+}),
+  "certificates": zod.array(zod.object({
+  "id": zod.string().min(1).max(getPublicPortfolioContentResponseOneCertificatesItemIdMax),
+  "title": zod.string().max(getPublicPortfolioContentResponseOneCertificatesItemTitleMax),
+  "issuer": zod.string().max(getPublicPortfolioContentResponseOneCertificatesItemIssuerMax),
+  "completed": zod.string().max(getPublicPortfolioContentResponseOneCertificatesItemCompletedMax).describe('YYYY-MM-DD when published'),
+  "verificationUrl": zod.string().max(getPublicPortfolioContentResponseOneCertificatesItemVerificationUrlMax).describe('Optional blank or HTTPS URL'),
+  "published": zod.boolean()
+})).max(getPublicPortfolioContentResponseOneCertificatesMax).default(getPublicPortfolioContentResponseOneCertificatesDefault),
+  "recommendations": zod.array(zod.object({
+  "id": zod.string().min(1).max(getPublicPortfolioContentResponseOneRecommendationsItemIdMax),
+  "author": zod.string().max(getPublicPortfolioContentResponseOneRecommendationsItemAuthorMax),
+  "relationship": zod.string().max(getPublicPortfolioContentResponseOneRecommendationsItemRelationshipMax),
+  "text": zod.string().max(getPublicPortfolioContentResponseOneRecommendationsItemTextMax),
+  "consent": zod.boolean(),
+  "approved": zod.boolean(),
+  "published": zod.boolean()
+})).max(getPublicPortfolioContentResponseOneRecommendationsMax).default(getPublicPortfolioContentResponseOneRecommendationsDefault)
+}).and(zod.object({
+  "updatedAt": zod.coerce.date().nullable()
+}))
+
+
+/**
+ * @summary Get the complete portfolio content document for the verified owner
+ */
+export const getOwnerPortfolioContentResponseOneBookingEnabledDefault = false;
+export const getOwnerPortfolioContentResponseOneBookingUrlDefault = ``;
+export const getOwnerPortfolioContentResponseOneBookingUrlMax = 2048;
+
+export const getOwnerPortfolioContentResponseOneBookingTimezoneDefault = `Asia/Kolkata`;
+export const getOwnerPortfolioContentResponseOneBookingTimezoneMax = 100;
+
+export const getOwnerPortfolioContentResponseOneBookingAvailabilityDefault = ``;
+export const getOwnerPortfolioContentResponseOneBookingAvailabilityMax = 2000;
+
+export const getOwnerPortfolioContentResponseOneAvailabilityPublishedDefault = false;
+export const getOwnerPortfolioContentResponseOneAvailabilityRolesDefault = ``;
+export const getOwnerPortfolioContentResponseOneAvailabilityRolesMax = 2000;
+
+export const getOwnerPortfolioContentResponseOneAvailabilityWorkArrangementDefault = ``;
+export const getOwnerPortfolioContentResponseOneAvailabilityWorkArrangementMax = 1000;
+
+export const getOwnerPortfolioContentResponseOneAvailabilityLocationsDefault = ``;
+export const getOwnerPortfolioContentResponseOneAvailabilityLocationsMax = 1000;
+
+export const getOwnerPortfolioContentResponseOneAvailabilityJoiningDefault = ``;
+export const getOwnerPortfolioContentResponseOneAvailabilityJoiningMax = 1000;
+
+export const getOwnerPortfolioContentResponseOneCertificatesItemIdMax = 100;
+
+export const getOwnerPortfolioContentResponseOneCertificatesItemTitleMax = 200;
+
+export const getOwnerPortfolioContentResponseOneCertificatesItemIssuerMax = 200;
+
+export const getOwnerPortfolioContentResponseOneCertificatesItemCompletedMax = 10;
+
+export const getOwnerPortfolioContentResponseOneCertificatesItemVerificationUrlMax = 2048;
+
+export const getOwnerPortfolioContentResponseOneCertificatesDefault = [];
+export const getOwnerPortfolioContentResponseOneCertificatesMax = 30;
+
+export const getOwnerPortfolioContentResponseOneRecommendationsItemIdMax = 100;
+
+export const getOwnerPortfolioContentResponseOneRecommendationsItemAuthorMax = 160;
+
+export const getOwnerPortfolioContentResponseOneRecommendationsItemRelationshipMax = 160;
+
+export const getOwnerPortfolioContentResponseOneRecommendationsItemTextMax = 3000;
+
+export const getOwnerPortfolioContentResponseOneRecommendationsDefault = [];
+export const getOwnerPortfolioContentResponseOneRecommendationsMax = 30;
+
+
+
+export const GetOwnerPortfolioContentResponse = zod.object({
+  "booking": zod.object({
+  "enabled": zod.boolean().default(getOwnerPortfolioContentResponseOneBookingEnabledDefault),
+  "url": zod.string().max(getOwnerPortfolioContentResponseOneBookingUrlMax).default(getOwnerPortfolioContentResponseOneBookingUrlDefault),
+  "timezone": zod.string().min(1).max(getOwnerPortfolioContentResponseOneBookingTimezoneMax).default(getOwnerPortfolioContentResponseOneBookingTimezoneDefault),
+  "availability": zod.string().max(getOwnerPortfolioContentResponseOneBookingAvailabilityMax).default(getOwnerPortfolioContentResponseOneBookingAvailabilityDefault)
+}),
+  "availability": zod.object({
+  "published": zod.boolean().default(getOwnerPortfolioContentResponseOneAvailabilityPublishedDefault),
+  "roles": zod.string().max(getOwnerPortfolioContentResponseOneAvailabilityRolesMax).default(getOwnerPortfolioContentResponseOneAvailabilityRolesDefault),
+  "workArrangement": zod.string().max(getOwnerPortfolioContentResponseOneAvailabilityWorkArrangementMax).default(getOwnerPortfolioContentResponseOneAvailabilityWorkArrangementDefault),
+  "locations": zod.string().max(getOwnerPortfolioContentResponseOneAvailabilityLocationsMax).default(getOwnerPortfolioContentResponseOneAvailabilityLocationsDefault),
+  "joining": zod.string().max(getOwnerPortfolioContentResponseOneAvailabilityJoiningMax).default(getOwnerPortfolioContentResponseOneAvailabilityJoiningDefault)
+}),
+  "certificates": zod.array(zod.object({
+  "id": zod.string().min(1).max(getOwnerPortfolioContentResponseOneCertificatesItemIdMax),
+  "title": zod.string().max(getOwnerPortfolioContentResponseOneCertificatesItemTitleMax),
+  "issuer": zod.string().max(getOwnerPortfolioContentResponseOneCertificatesItemIssuerMax),
+  "completed": zod.string().max(getOwnerPortfolioContentResponseOneCertificatesItemCompletedMax).describe('YYYY-MM-DD when published'),
+  "verificationUrl": zod.string().max(getOwnerPortfolioContentResponseOneCertificatesItemVerificationUrlMax).describe('Optional blank or HTTPS URL'),
+  "published": zod.boolean()
+})).max(getOwnerPortfolioContentResponseOneCertificatesMax).default(getOwnerPortfolioContentResponseOneCertificatesDefault),
+  "recommendations": zod.array(zod.object({
+  "id": zod.string().min(1).max(getOwnerPortfolioContentResponseOneRecommendationsItemIdMax),
+  "author": zod.string().max(getOwnerPortfolioContentResponseOneRecommendationsItemAuthorMax),
+  "relationship": zod.string().max(getOwnerPortfolioContentResponseOneRecommendationsItemRelationshipMax),
+  "text": zod.string().max(getOwnerPortfolioContentResponseOneRecommendationsItemTextMax),
+  "consent": zod.boolean(),
+  "approved": zod.boolean(),
+  "published": zod.boolean()
+})).max(getOwnerPortfolioContentResponseOneRecommendationsMax).default(getOwnerPortfolioContentResponseOneRecommendationsDefault)
+}).and(zod.object({
+  "updatedAt": zod.coerce.date().nullable()
+}))
+
+
+/**
+ * @summary Replace the complete portfolio content document
+ */
+export const updateOwnerPortfolioContentBodyBookingEnabledDefault = false;
+export const updateOwnerPortfolioContentBodyBookingUrlDefault = ``;
+export const updateOwnerPortfolioContentBodyBookingUrlMax = 2048;
+
+export const updateOwnerPortfolioContentBodyBookingTimezoneDefault = `Asia/Kolkata`;
+export const updateOwnerPortfolioContentBodyBookingTimezoneMax = 100;
+
+export const updateOwnerPortfolioContentBodyBookingAvailabilityDefault = ``;
+export const updateOwnerPortfolioContentBodyBookingAvailabilityMax = 2000;
+
+export const updateOwnerPortfolioContentBodyAvailabilityPublishedDefault = false;
+export const updateOwnerPortfolioContentBodyAvailabilityRolesDefault = ``;
+export const updateOwnerPortfolioContentBodyAvailabilityRolesMax = 2000;
+
+export const updateOwnerPortfolioContentBodyAvailabilityWorkArrangementDefault = ``;
+export const updateOwnerPortfolioContentBodyAvailabilityWorkArrangementMax = 1000;
+
+export const updateOwnerPortfolioContentBodyAvailabilityLocationsDefault = ``;
+export const updateOwnerPortfolioContentBodyAvailabilityLocationsMax = 1000;
+
+export const updateOwnerPortfolioContentBodyAvailabilityJoiningDefault = ``;
+export const updateOwnerPortfolioContentBodyAvailabilityJoiningMax = 1000;
+
+export const updateOwnerPortfolioContentBodyCertificatesItemIdMax = 100;
+
+export const updateOwnerPortfolioContentBodyCertificatesItemTitleMax = 200;
+
+export const updateOwnerPortfolioContentBodyCertificatesItemIssuerMax = 200;
+
+export const updateOwnerPortfolioContentBodyCertificatesItemCompletedMax = 10;
+
+export const updateOwnerPortfolioContentBodyCertificatesItemVerificationUrlMax = 2048;
+
+export const updateOwnerPortfolioContentBodyCertificatesDefault = [];
+export const updateOwnerPortfolioContentBodyCertificatesMax = 30;
+
+export const updateOwnerPortfolioContentBodyRecommendationsItemIdMax = 100;
+
+export const updateOwnerPortfolioContentBodyRecommendationsItemAuthorMax = 160;
+
+export const updateOwnerPortfolioContentBodyRecommendationsItemRelationshipMax = 160;
+
+export const updateOwnerPortfolioContentBodyRecommendationsItemTextMax = 3000;
+
+export const updateOwnerPortfolioContentBodyRecommendationsDefault = [];
+export const updateOwnerPortfolioContentBodyRecommendationsMax = 30;
+
+
+
+export const UpdateOwnerPortfolioContentBody = zod.object({
+  "booking": zod.object({
+  "enabled": zod.boolean().default(updateOwnerPortfolioContentBodyBookingEnabledDefault),
+  "url": zod.string().max(updateOwnerPortfolioContentBodyBookingUrlMax).default(updateOwnerPortfolioContentBodyBookingUrlDefault),
+  "timezone": zod.string().min(1).max(updateOwnerPortfolioContentBodyBookingTimezoneMax).default(updateOwnerPortfolioContentBodyBookingTimezoneDefault),
+  "availability": zod.string().max(updateOwnerPortfolioContentBodyBookingAvailabilityMax).default(updateOwnerPortfolioContentBodyBookingAvailabilityDefault)
+}),
+  "availability": zod.object({
+  "published": zod.boolean().default(updateOwnerPortfolioContentBodyAvailabilityPublishedDefault),
+  "roles": zod.string().max(updateOwnerPortfolioContentBodyAvailabilityRolesMax).default(updateOwnerPortfolioContentBodyAvailabilityRolesDefault),
+  "workArrangement": zod.string().max(updateOwnerPortfolioContentBodyAvailabilityWorkArrangementMax).default(updateOwnerPortfolioContentBodyAvailabilityWorkArrangementDefault),
+  "locations": zod.string().max(updateOwnerPortfolioContentBodyAvailabilityLocationsMax).default(updateOwnerPortfolioContentBodyAvailabilityLocationsDefault),
+  "joining": zod.string().max(updateOwnerPortfolioContentBodyAvailabilityJoiningMax).default(updateOwnerPortfolioContentBodyAvailabilityJoiningDefault)
+}),
+  "certificates": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateOwnerPortfolioContentBodyCertificatesItemIdMax),
+  "title": zod.string().max(updateOwnerPortfolioContentBodyCertificatesItemTitleMax),
+  "issuer": zod.string().max(updateOwnerPortfolioContentBodyCertificatesItemIssuerMax),
+  "completed": zod.string().max(updateOwnerPortfolioContentBodyCertificatesItemCompletedMax).describe('YYYY-MM-DD when published'),
+  "verificationUrl": zod.string().max(updateOwnerPortfolioContentBodyCertificatesItemVerificationUrlMax).describe('Optional blank or HTTPS URL'),
+  "published": zod.boolean()
+})).max(updateOwnerPortfolioContentBodyCertificatesMax).default(updateOwnerPortfolioContentBodyCertificatesDefault),
+  "recommendations": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateOwnerPortfolioContentBodyRecommendationsItemIdMax),
+  "author": zod.string().max(updateOwnerPortfolioContentBodyRecommendationsItemAuthorMax),
+  "relationship": zod.string().max(updateOwnerPortfolioContentBodyRecommendationsItemRelationshipMax),
+  "text": zod.string().max(updateOwnerPortfolioContentBodyRecommendationsItemTextMax),
+  "consent": zod.boolean(),
+  "approved": zod.boolean(),
+  "published": zod.boolean()
+})).max(updateOwnerPortfolioContentBodyRecommendationsMax).default(updateOwnerPortfolioContentBodyRecommendationsDefault)
+})
+
+export const updateOwnerPortfolioContentResponseOneBookingEnabledDefault = false;
+export const updateOwnerPortfolioContentResponseOneBookingUrlDefault = ``;
+export const updateOwnerPortfolioContentResponseOneBookingUrlMax = 2048;
+
+export const updateOwnerPortfolioContentResponseOneBookingTimezoneDefault = `Asia/Kolkata`;
+export const updateOwnerPortfolioContentResponseOneBookingTimezoneMax = 100;
+
+export const updateOwnerPortfolioContentResponseOneBookingAvailabilityDefault = ``;
+export const updateOwnerPortfolioContentResponseOneBookingAvailabilityMax = 2000;
+
+export const updateOwnerPortfolioContentResponseOneAvailabilityPublishedDefault = false;
+export const updateOwnerPortfolioContentResponseOneAvailabilityRolesDefault = ``;
+export const updateOwnerPortfolioContentResponseOneAvailabilityRolesMax = 2000;
+
+export const updateOwnerPortfolioContentResponseOneAvailabilityWorkArrangementDefault = ``;
+export const updateOwnerPortfolioContentResponseOneAvailabilityWorkArrangementMax = 1000;
+
+export const updateOwnerPortfolioContentResponseOneAvailabilityLocationsDefault = ``;
+export const updateOwnerPortfolioContentResponseOneAvailabilityLocationsMax = 1000;
+
+export const updateOwnerPortfolioContentResponseOneAvailabilityJoiningDefault = ``;
+export const updateOwnerPortfolioContentResponseOneAvailabilityJoiningMax = 1000;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesItemIdMax = 100;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesItemTitleMax = 200;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesItemIssuerMax = 200;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesItemCompletedMax = 10;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesItemVerificationUrlMax = 2048;
+
+export const updateOwnerPortfolioContentResponseOneCertificatesDefault = [];
+export const updateOwnerPortfolioContentResponseOneCertificatesMax = 30;
+
+export const updateOwnerPortfolioContentResponseOneRecommendationsItemIdMax = 100;
+
+export const updateOwnerPortfolioContentResponseOneRecommendationsItemAuthorMax = 160;
+
+export const updateOwnerPortfolioContentResponseOneRecommendationsItemRelationshipMax = 160;
+
+export const updateOwnerPortfolioContentResponseOneRecommendationsItemTextMax = 3000;
+
+export const updateOwnerPortfolioContentResponseOneRecommendationsDefault = [];
+export const updateOwnerPortfolioContentResponseOneRecommendationsMax = 30;
+
+
+
+export const UpdateOwnerPortfolioContentResponse = zod.object({
+  "booking": zod.object({
+  "enabled": zod.boolean().default(updateOwnerPortfolioContentResponseOneBookingEnabledDefault),
+  "url": zod.string().max(updateOwnerPortfolioContentResponseOneBookingUrlMax).default(updateOwnerPortfolioContentResponseOneBookingUrlDefault),
+  "timezone": zod.string().min(1).max(updateOwnerPortfolioContentResponseOneBookingTimezoneMax).default(updateOwnerPortfolioContentResponseOneBookingTimezoneDefault),
+  "availability": zod.string().max(updateOwnerPortfolioContentResponseOneBookingAvailabilityMax).default(updateOwnerPortfolioContentResponseOneBookingAvailabilityDefault)
+}),
+  "availability": zod.object({
+  "published": zod.boolean().default(updateOwnerPortfolioContentResponseOneAvailabilityPublishedDefault),
+  "roles": zod.string().max(updateOwnerPortfolioContentResponseOneAvailabilityRolesMax).default(updateOwnerPortfolioContentResponseOneAvailabilityRolesDefault),
+  "workArrangement": zod.string().max(updateOwnerPortfolioContentResponseOneAvailabilityWorkArrangementMax).default(updateOwnerPortfolioContentResponseOneAvailabilityWorkArrangementDefault),
+  "locations": zod.string().max(updateOwnerPortfolioContentResponseOneAvailabilityLocationsMax).default(updateOwnerPortfolioContentResponseOneAvailabilityLocationsDefault),
+  "joining": zod.string().max(updateOwnerPortfolioContentResponseOneAvailabilityJoiningMax).default(updateOwnerPortfolioContentResponseOneAvailabilityJoiningDefault)
+}),
+  "certificates": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateOwnerPortfolioContentResponseOneCertificatesItemIdMax),
+  "title": zod.string().max(updateOwnerPortfolioContentResponseOneCertificatesItemTitleMax),
+  "issuer": zod.string().max(updateOwnerPortfolioContentResponseOneCertificatesItemIssuerMax),
+  "completed": zod.string().max(updateOwnerPortfolioContentResponseOneCertificatesItemCompletedMax).describe('YYYY-MM-DD when published'),
+  "verificationUrl": zod.string().max(updateOwnerPortfolioContentResponseOneCertificatesItemVerificationUrlMax).describe('Optional blank or HTTPS URL'),
+  "published": zod.boolean()
+})).max(updateOwnerPortfolioContentResponseOneCertificatesMax).default(updateOwnerPortfolioContentResponseOneCertificatesDefault),
+  "recommendations": zod.array(zod.object({
+  "id": zod.string().min(1).max(updateOwnerPortfolioContentResponseOneRecommendationsItemIdMax),
+  "author": zod.string().max(updateOwnerPortfolioContentResponseOneRecommendationsItemAuthorMax),
+  "relationship": zod.string().max(updateOwnerPortfolioContentResponseOneRecommendationsItemRelationshipMax),
+  "text": zod.string().max(updateOwnerPortfolioContentResponseOneRecommendationsItemTextMax),
+  "consent": zod.boolean(),
+  "approved": zod.boolean(),
+  "published": zod.boolean()
+})).max(updateOwnerPortfolioContentResponseOneRecommendationsMax).default(updateOwnerPortfolioContentResponseOneRecommendationsDefault)
+}).and(zod.object({
+  "updatedAt": zod.coerce.date().nullable()
+}))
+
+
+/**
  * @summary Send a private recruiter note to the portfolio owner
  */
 export const submitPortfolioFeedbackBodyMessageMin = 10;
@@ -95,12 +441,12 @@ export const AskAmbassadorResponse = zod.object({
  * @summary List the signed-in user's saved workspace records
  */
 export const ListWorkspaceRecordsQueryParams = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']).optional()
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']).optional()
 })
 
 export const ListWorkspaceRecordsResponseItem = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -120,7 +466,7 @@ export const createWorkspaceRecordBodyContentMax = 50000;
 
 
 export const CreateWorkspaceRecordBody = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string().min(1).max(createWorkspaceRecordBodyTitleMax),
   "content": zod.string().max(createWorkspaceRecordBodyContentMax),
   "metadata": zod.record(zod.string(), zod.unknown()).optional().describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n')
@@ -128,7 +474,7 @@ export const CreateWorkspaceRecordBody = zod.object({
 
 export const CreateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -144,7 +490,7 @@ export const ExportWorkspaceDataResponse = zod.object({
   "exportedAt": zod.coerce.date(),
   "records": zod.array(zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -194,7 +540,7 @@ export const UpdateWorkspaceRecordBody = zod.object({
 
 export const UpdateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -268,7 +614,7 @@ export const generateWorkspaceContentResponseOneTwoMetadataBatchIdMax = 100;
 
 export const GenerateWorkspaceContentResponse = zod.union([zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -301,7 +647,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 })
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -321,7 +667,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 }).describe('Complete before/after document comparison for a tailored resume that must be reviewed before use.')
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -337,7 +683,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 }).describe('Follow-up email subject, notes, and tracked application link.')
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -358,7 +704,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 })
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),

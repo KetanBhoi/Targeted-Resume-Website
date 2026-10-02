@@ -793,4 +793,64 @@ describe('workspace API authentication and ownership', () => {
     expect(interview.status).toBe(409);
     expect(mockGenerationState.calls).toBe(modelCalls);
   });
+
+  it('validates simulation and practice metadata on create and merged updates', async () => {
+    const invalidSimulation = await request('/api/workspace/records', {
+      userId: 'typed-record-user',
+      method: 'POST',
+      body: {
+        kind: 'simulation',
+        title: 'Customer scenario',
+        content: '{"notes":"candidate-written"}',
+        metadata: { scenarioId: 'support', stage: '' },
+      },
+    });
+    expect(invalidSimulation.status).toBe(400);
+
+    const simulation = await request('/api/workspace/records', {
+      userId: 'typed-record-user',
+      method: 'POST',
+      body: {
+        kind: 'simulation',
+        title: 'Customer scenario',
+        content: '{"notes":"candidate-written"}',
+        metadata: { scenarioId: 'support', stage: 'opening' },
+      },
+    });
+    expect(simulation.status).toBe(201);
+    const savedSimulation = await simulation.json() as { id: number; content: string };
+    expect(savedSimulation.content).toBe('{"notes":"candidate-written"}');
+
+    const contentOnlyUpdate = await request(`/api/workspace/records/${savedSimulation.id}`, {
+      userId: 'typed-record-user',
+      method: 'PATCH',
+      body: { content: 'Updated written response.' },
+    });
+    expect(contentOnlyUpdate.status).toBe(200);
+
+    const invalidMergedMetadata = await request(`/api/workspace/records/${savedSimulation.id}`, {
+      userId: 'typed-record-user',
+      method: 'PATCH',
+      body: { metadata: { scenarioId: 'support' } },
+    });
+    expect(invalidMergedMetadata.status).toBe(400);
+
+    const invalidPractice = await request('/api/workspace/records', {
+      userId: 'typed-record-user',
+      method: 'POST',
+      body: {
+        kind: 'practice',
+        title: 'Answer practice',
+        content: 'Candidate-written answer.',
+        metadata: {
+          question: 'How do you prioritize?',
+          category: 'behavioral',
+          duration: 15,
+          checks: [true, false, true],
+          reflection: '',
+        },
+      },
+    });
+    expect(invalidPractice.status).toBe(400);
+  });
 });

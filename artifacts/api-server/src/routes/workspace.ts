@@ -18,6 +18,7 @@ import { db, workspaceRecordsTable } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { and, desc, eq } from "drizzle-orm";
 import { Router, type IRouter, type Request } from "express";
+import { isValidWorkspaceKindMetadata } from "../lib/workspace-record-metadata";
 
 const router: IRouter = Router();
 const generationRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -315,6 +316,10 @@ router.post("/workspace/records", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Check the record title and content." });
     return;
   }
+  if (!isValidWorkspaceKindMetadata(parsed.data.kind, parsed.data.metadata)) {
+    res.status(400).json({ error: "Provide valid metadata for this workspace record kind." });
+    return;
+  }
 
   const [record] = await db
     .insert(workspaceRecordsTable)
@@ -358,6 +363,26 @@ router.patch("/workspace/records/:id", async (req, res): Promise<void> => {
   const parsed = UpdateWorkspaceRecordBody.safeParse(req.body);
   if (!params.success || !parsed.success || Object.keys(parsed.data).length === 0) {
     res.status(400).json({ error: "Provide a valid record update." });
+    return;
+  }
+
+  const [existing] = await db
+    .select()
+    .from(workspaceRecordsTable)
+    .where(
+      and(
+        eq(workspaceRecordsTable.id, params.data.id),
+        eq(workspaceRecordsTable.userId, userId),
+      ),
+    )
+    .limit(1);
+  if (!existing) {
+    res.status(404).json({ error: "Record not found." });
+    return;
+  }
+  const mergedMetadata = parsed.data.metadata ?? existing.metadata;
+  if (!isValidWorkspaceKindMetadata(existing.kind, mergedMetadata)) {
+    res.status(400).json({ error: "Provide valid metadata for this workspace record kind." });
     return;
   }
 

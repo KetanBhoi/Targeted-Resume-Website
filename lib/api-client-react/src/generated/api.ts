@@ -25,6 +25,8 @@ import type {
   ApiError,
   HealthStatus,
   ListWorkspaceRecordsParams,
+  PortfolioContent,
+  PortfolioContentInput,
   PortfolioFeedback,
   PortfolioFeedbackInput,
   PortfolioFeedbackReceipt,
@@ -65,6 +67,248 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPublicPortfolioContentUrl = () => {
+
+
+
+
+  return `/api/portfolio/content`
+}
+
+/**
+ * @summary Get only approved, published portfolio content
+ */
+export const getPublicPortfolioContent = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortfolioContent> => {
+
+  return customFetch<PortfolioContent>(getGetPublicPortfolioContentUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPortfolioContentQueryKey = () => {
+    return [
+    `/api/portfolio/content`
+    ] as const;
+    }
+
+
+export const getGetPublicPortfolioContentQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPortfolioContent>>, TError = ErrorType<ApiError>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortfolioContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPortfolioContentQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPortfolioContent>>> = ({ signal }) => getPublicPortfolioContent({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPortfolioContent>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicPortfolioContentQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPortfolioContent>>>
+export type GetPublicPortfolioContentQueryError = ErrorType<ApiError>
+
+
+/**
+ * @summary Get only approved, published portfolio content
+ */
+
+export function useGetPublicPortfolioContent<TData = Awaited<ReturnType<typeof getPublicPortfolioContent>>, TError = ErrorType<ApiError>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortfolioContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicPortfolioContentQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetOwnerPortfolioContentUrl = () => {
+
+
+
+
+  return `/api/portfolio/content/owner`
+}
+
+/**
+ * @summary Get the complete portfolio content document for the verified owner
+ */
+export const getOwnerPortfolioContent = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortfolioContent> => {
+
+  return customFetch<PortfolioContent>(getGetOwnerPortfolioContentUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnerPortfolioContentQueryKey = () => {
+    return [
+    `/api/portfolio/content/owner`
+    ] as const;
+    }
+
+
+export const getGetOwnerPortfolioContentQueryOptions = <TData = Awaited<ReturnType<typeof getOwnerPortfolioContent>>, TError = ErrorType<ApiError>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerPortfolioContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnerPortfolioContentQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnerPortfolioContent>>> = ({ signal }) => getOwnerPortfolioContent({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnerPortfolioContent>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOwnerPortfolioContentQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnerPortfolioContent>>>
+export type GetOwnerPortfolioContentQueryError = ErrorType<ApiError>
+
+
+/**
+ * @summary Get the complete portfolio content document for the verified owner
+ */
+
+export function useGetOwnerPortfolioContent<TData = Awaited<ReturnType<typeof getOwnerPortfolioContent>>, TError = ErrorType<ApiError>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerPortfolioContent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOwnerPortfolioContentQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateOwnerPortfolioContentUrl = () => {
+
+
+
+
+  return `/api/portfolio/content/owner`
+}
+
+/**
+ * @summary Replace the complete portfolio content document
+ */
+export const updateOwnerPortfolioContent = async (portfolioContentInput: PortfolioContentInput, options?: Parameters<typeof customFetch>[1]): Promise<PortfolioContent> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortfolioContent>(getUpdateOwnerPortfolioContentUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portfolioContentInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateOwnerPortfolioContentMutationKey = () => ['updateOwnerPortfolioContent'] as const;
+
+export const getUpdateOwnerPortfolioContentMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOwnerPortfolioContent>>, TError,UpdateOwnerPortfolioContentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateOwnerPortfolioContent>>, TError,UpdateOwnerPortfolioContentMutationVariables, TContext> => {
+
+const mutationKey = getUpdateOwnerPortfolioContentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOwnerPortfolioContent>>, UpdateOwnerPortfolioContentMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateOwnerPortfolioContent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateOwnerPortfolioContentMutationResult = NonNullable<Awaited<ReturnType<typeof updateOwnerPortfolioContent>>>
+    export type UpdateOwnerPortfolioContentMutationBody = BodyType<PortfolioContentInput>
+    export type UpdateOwnerPortfolioContentMutationError = ErrorType<ApiError>
+    export type UpdateOwnerPortfolioContentMutationVariables = {data: BodyType<PortfolioContentInput>}
+
+    /**
+ * @summary Replace the complete portfolio content document
+ */
+export const useUpdateOwnerPortfolioContent = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOwnerPortfolioContent>>, TError,UpdateOwnerPortfolioContentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateOwnerPortfolioContent>>,
+        TError,
+        UpdateOwnerPortfolioContentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateOwnerPortfolioContentMutationOptions(options));
+    }
 
 export const getSubmitPortfolioFeedbackUrl = () => {
 

@@ -17,4 +17,6 @@ export const WorkspaceRecordKind = {
   'cover-letter': 'cover-letter',
   linkedin: 'linkedin',
   'follow-up': 'follow-up',
+  simulation: 'simulation',
+  practice: 'practice',
 } as const;

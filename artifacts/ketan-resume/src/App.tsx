@@ -28,6 +28,7 @@ import { portfolio, type PortfolioSection } from '@/data/portfolio';
 import NotFound from '@/pages/not-found';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import WorkspacePage from '@/pages/workspace';
+import PortfolioExtras from '@/components/portfolio-extras';
 import { createUserCacheInvalidator } from '@/lib/user-cache';
 import { RecruiterTools, RecruiterFeedback } from '@/components/recruiter-tools';
 import RecruiterBrief from '@/pages/recruiter-brief';
@@ -702,6 +703,7 @@ function Home() {
         {view === 'hiring-manager' && <><Experience /><RoleFit /><Skills /></>}
         {view === 'technical' && <><Skills /><Experience /><RoleFit /></>}
         <Education />
+        <PortfolioExtras />
         <Ambassador />
         <RecruiterFeedback view={view} />
         <ContactStatus />
@@ -770,6 +772,9 @@ function Router() {
         <Route path="/workspace/match" component={ProtectedWorkspace} />
         <Route path="/workspace/prepare" component={ProtectedWorkspace} />
         <Route path="/workspace/studio" component={ProtectedWorkspace} />
+        <Route path="/workspace/lab" component={ProtectedWorkspace} />
+        <Route path="/workspace/practice" component={ProtectedWorkspace} />
+        <Route path="/workspace/portfolio" component={ProtectedWorkspace} />
         <Route path="/workspace/insights" component={ProtectedWorkspace} />
         <Route component={NotFound} />
       </Switch>

@@ -19,3 +19,4 @@
 
 export * from "./workspace-records";
 export * from "./portfolio-feedback";
+export * from "./portfolio-content";

@@ -14,7 +14,98 @@ tags:
     description: Evidence-grounded candidate questions
   - name: workspace
     description: Private candidate workspace records and preparation tools
+  - name: portfolio
+    description: Public portfolio content and owner editing
 paths:
+  /portfolio/content:
+    get:
+      operationId: getPublicPortfolioContent
+      tags: [portfolio]
+      summary: Get only approved, published portfolio content
+      responses:
+        "200":
+          description: Public-safe portfolio content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioContent"
+        "503":
+          description: Portfolio content is unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /portfolio/content/owner:
+    get:
+      operationId: getOwnerPortfolioContent
+      tags: [portfolio]
+      summary: Get the complete portfolio content document for the verified owner
+      responses:
+        "200":
+          description: Full portfolio content including drafts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioContent"
+        "401":
+          description: Sign in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Owner access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Owner check or content storage unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    put:
+      operationId: updateOwnerPortfolioContent
+      tags: [portfolio]
+      summary: Replace the complete portfolio content document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PortfolioContentInput"
+      responses:
+        "200":
+          description: Updated complete portfolio content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioContent"
+        "400":
+          description: Invalid portfolio content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Sign in required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Owner access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Owner check or content storage unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /portfolio/feedback:
     post:
       operationId: submitPortfolioFeedback
@@ -410,6 +501,73 @@ components:
         isOwner:
           type: boolean
       required: [isOwner]
+    PortfolioBooking:
+      type: object
+      properties:
+        enabled: { type: boolean, default: false }
+        url: { type: string, maxLength: 2048, default: "" }
+        timezone: { type: string, minLength: 1, maxLength: 100, default: Asia/Kolkata }
+        availability: { type: string, maxLength: 2000, default: "" }
+      required: [enabled, url, timezone, availability]
+    PortfolioAvailability:
+      type: object
+      properties:
+        published: { type: boolean, default: false }
+        roles: { type: string, maxLength: 2000, default: "" }
+        workArrangement: { type: string, maxLength: 1000, default: "" }
+        locations: { type: string, maxLength: 1000, default: "" }
+        joining: { type: string, maxLength: 1000, default: "" }
+      required: [published, roles, workArrangement, locations, joining]
+    PortfolioCertificate:
+      type: object
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        title: { type: string, maxLength: 200 }
+        issuer: { type: string, maxLength: 200 }
+        completed: { type: string, maxLength: 10, description: YYYY-MM-DD when published }
+        verificationUrl: { type: string, maxLength: 2048, description: Optional blank or HTTPS URL }
+        published: { type: boolean }
+      required: [id, title, issuer, completed, verificationUrl, published]
+    PortfolioRecommendation:
+      type: object
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        author: { type: string, maxLength: 160 }
+        relationship: { type: string, maxLength: 160 }
+        text: { type: string, maxLength: 3000 }
+        consent: { type: boolean }
+        approved: { type: boolean }
+        published: { type: boolean }
+      required: [id, author, relationship, text, consent, approved, published]
+    PortfolioContentInput:
+      type: object
+      properties:
+        booking:
+          $ref: "#/components/schemas/PortfolioBooking"
+        availability:
+          $ref: "#/components/schemas/PortfolioAvailability"
+        certificates:
+          type: array
+          maxItems: 30
+          default: []
+          items:
+            $ref: "#/components/schemas/PortfolioCertificate"
+        recommendations:
+          type: array
+          maxItems: 30
+          default: []
+          items:
+            $ref: "#/components/schemas/PortfolioRecommendation"
+      required: [booking, availability, certificates, recommendations]
+    PortfolioContent:
+      allOf:
+        - $ref: "#/components/schemas/PortfolioContentInput"
+        - type: object
+          properties:
+            updatedAt:
+              type: ["string", "null"]
+              format: date-time
+          required: [updatedAt]
     HealthStatus:
       type: object
       properties:
@@ -446,7 +604,7 @@ components:
         - error
     WorkspaceRecordKind:
       type: string
-      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up]
+      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up, simulation, practice]
     WorkspaceRecord:
       type: object
       properties:
@@ -568,6 +726,25 @@ components:
         Extensible kind-specific data. Generated analysis, tailored resume,
         follow-up, and interview records use their corresponding typed schemas.
       additionalProperties: true
+    WorkspaceSimulationMetadata:
+      type: object
+      properties:
+        scenarioId: { type: string, minLength: 1, maxLength: 120 }
+        stage: { type: string, minLength: 1, maxLength: 80 }
+      required: [scenarioId, stage]
+    WorkspacePracticeMetadata:
+      type: object
+      properties:
+        question: { type: string, minLength: 1, maxLength: 2000 }
+        category: { type: string, minLength: 1, maxLength: 80 }
+        duration: { type: integer, minimum: 1, maximum: 1440 }
+        checks:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items: { type: boolean }
+        reflection: { type: string, maxLength: 5000 }
+      required: [question, category, duration, checks, reflection]
     WorkspaceAnalysisMetadata:
       type: object
       properties:

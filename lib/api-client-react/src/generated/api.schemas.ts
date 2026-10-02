@@ -72,6 +72,85 @@ export interface PortfolioOwnerAccess {
   isOwner: boolean;
 }
 
+export interface PortfolioBooking {
+  enabled: boolean;
+  /** @maxLength 2048 */
+  url: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  timezone: string;
+  /** @maxLength 2000 */
+  availability: string;
+}
+
+export interface PortfolioAvailability {
+  published: boolean;
+  /** @maxLength 2000 */
+  roles: string;
+  /** @maxLength 1000 */
+  workArrangement: string;
+  /** @maxLength 1000 */
+  locations: string;
+  /** @maxLength 1000 */
+  joining: string;
+}
+
+export interface PortfolioCertificate {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /** @maxLength 200 */
+  title: string;
+  /** @maxLength 200 */
+  issuer: string;
+  /**
+     * YYYY-MM-DD when published
+     * @maxLength 10
+     */
+  completed: string;
+  /**
+     * Optional blank or HTTPS URL
+     * @maxLength 2048
+     */
+  verificationUrl: string;
+  published: boolean;
+}
+
+export interface PortfolioRecommendation {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /** @maxLength 160 */
+  author: string;
+  /** @maxLength 160 */
+  relationship: string;
+  /** @maxLength 3000 */
+  text: string;
+  consent: boolean;
+  approved: boolean;
+  published: boolean;
+}
+
+export interface PortfolioContentInput {
+  booking: PortfolioBooking;
+  availability: PortfolioAvailability;
+  /** @maxItems 30 */
+  certificates: PortfolioCertificate[];
+  /** @maxItems 30 */
+  recommendations: PortfolioRecommendation[];
+}
+
+export type PortfolioContent = PortfolioContentInput & ({
+  /** @nullable */
+  updatedAt: string | null;
+});
+
 export interface HealthStatus {
   status: string;
 }
@@ -120,6 +199,8 @@ export const WorkspaceRecordKind = {
   'cover-letter': 'cover-letter',
   linkedin: 'linkedin',
   'follow-up': 'follow-up',
+  simulation: 'simulation',
+  practice: 'practice',
 } as const;
 
 /**
@@ -241,6 +322,44 @@ export interface WorkspaceGenerationInput {
      */
   batchId?: string;
   questionCategory?: WorkspaceInterviewQuestionCategory;
+}
+
+export interface WorkspaceSimulationMetadata {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  scenarioId: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  stage: string;
+}
+
+export interface WorkspacePracticeMetadata {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  question: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  category: string;
+  /**
+     * @minimum 1
+     * @maximum 1440
+     */
+  duration: number;
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  checks: boolean[];
+  /** @maxLength 5000 */
+  reflection: string;
 }
 
 export type WorkspaceRoadmapItemPriority = typeof WorkspaceRoadmapItemPriority[keyof typeof WorkspaceRoadmapItemPriority];

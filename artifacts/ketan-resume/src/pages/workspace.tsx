@@ -47,6 +47,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useGetPortfolioOwnerAccess } from '@workspace/api-client-react';
 import InterviewStudio from '@/pages/interview-studio';
 import PortfolioInsights from '@/pages/portfolio-insights';
+import RecruitingLab from '@/pages/recruiting-lab';
+import PracticeHistory from '@/pages/practice-history';
+import PortfolioSettings from '@/pages/portfolio-settings';
 import { Link, useLocation } from 'wouter';
 import {
   buildKeywordPreview,
@@ -58,12 +61,15 @@ import {
   readKeywordHeatmap,
 } from '@/lib/workspace-features';
 
-type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare' | 'studio' | 'insights';
+type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare' | 'studio' | 'insights' | 'lab' | 'practice' | 'portfolio';
 type Meta = Record<string, unknown>;
 type RecordKind = WorkspaceRecordKind;
 
 const viewCopy: Record<WorkspaceView, { eyebrow: string; title: string; description: string }> = {
-  studio: { eyebrow: 'Interview studio', title: 'Practice with a clear timer.', description: 'Local drafts and optional audio, with no uploads.' },
+  studio: { eyebrow: 'Interview studio', title: 'Practice with a clear timer.', description: 'Local audio and drafts, with optional private saving of written answers.' },
+  lab: { eyebrow: 'Recruiting lab', title: 'Learn by practicing.', description: 'Fictional recruiting exercises, never claims of professional experience.' },
+  practice: { eyebrow: 'Practice history', title: 'Reflect on your preparation.', description: 'Your privately saved written answers and reflections.' },
+  portfolio: { eyebrow: 'Portfolio settings', title: 'Choose what employers see.', description: 'Owner-only publishing controls for availability, booking, credentials, and recommendations.' },
   insights: { eyebrow: 'Owner insights', title: 'See what recruiters noticed.', description: 'Private feedback and portfolio analytics.' },
   overview: {
     eyebrow: 'Private career workbench',
@@ -93,10 +99,16 @@ const navItems: { label: string; hint: string; href: string; view: WorkspaceView
   { label: 'Role match', hint: 'ATS + skill gaps', href: '/workspace/match', view: 'match', icon: BarChart3 },
   { label: 'Prepare', hint: 'Answers + writing', href: '/workspace/prepare', view: 'prepare', icon: Sparkles },
   { label: 'Interview studio', hint: 'Timed + local practice', href: '/workspace/studio', view: 'studio', icon: MessageCircle },
+  { label: 'Practice history', hint: 'Written answers + reflections', href: '/workspace/practice', view: 'practice', icon: Clock3 },
+  { label: 'Recruiting lab', hint: 'Fictional practice exercises', href: '/workspace/lab', view: 'lab', icon: FlaskConical },
+  { label: 'Portfolio settings', hint: 'Owner-only public content', href: '/workspace/portfolio', view: 'portfolio', icon: ShieldCheck },
   { label: 'Portfolio insights', hint: 'Owner-only feedback', href: '/workspace/insights', view: 'insights', icon: BarChart3 },
 ];
 
 function getView(path: string): WorkspaceView {
+  if (path.includes('/portfolio')) return 'portfolio';
+  if (path.includes('/practice')) return 'practice';
+  if (path.includes('/lab')) return 'lab';
   if (path.includes('/studio')) return 'studio';
   if (path.includes('/insights')) return 'insights';
   if (path.includes('/jobs')) return 'jobs';
@@ -289,7 +301,7 @@ function WorkspaceSidebar({ view, onClose }: { view: WorkspaceView; onClose: () 
 
       <div className="workspace-sidebar-label">Workspace</div>
       <nav className="workspace-nav" aria-label="Workspace navigation">
-        {navItems.filter((item) => item.view !== 'insights' || owner.data?.isOwner).map((item) => {
+        {navItems.filter((item) => !['insights', 'portfolio'].includes(item.view) || owner.data?.isOwner).map((item) => {
           const Icon = item.icon;
           return (
             <Link
@@ -737,7 +749,7 @@ function PrivacyControls({ records, onChanged }: { records: WorkspaceRecord[]; o
         <ShieldCheck size={19} />
       </div>
       <div className="workspace-privacy-body">
-        <p>Export or remove your private resumes, job descriptions, analyses, and generated drafts. Exported files include the saved record content and metadata.</p>
+        <p>Export or remove your private resumes, job descriptions, analyses, generated drafts, saved written practice, and recruiting simulations. Exported files include the saved record content and metadata. Public portfolio settings and recruiter feedback are managed separately.</p>
         <div className="workspace-privacy-actions">
           <button type="button" className="workspace-button workspace-button-quiet" onClick={() => void exportData()} disabled={exporting || deleting} data-testid="button-export-workspace"><Download size={15} /> {exporting ? 'Exporting…' : 'Export all as JSON'}</button>
           <button type="button" className="workspace-button workspace-button-quiet" disabled={!analysisCount || deleting} onClick={() => { setConfirming('analysis'); setConfirmationText(''); setNotice(''); setError(''); }} data-testid="button-clear-analysis-history"><Trash2 size={14} /> Clear analysis history <span>{analysisCount}</span></button>
@@ -746,7 +758,7 @@ function PrivacyControls({ records, onChanged }: { records: WorkspaceRecord[]; o
         {confirming && (
           <div className="workspace-privacy-confirm" role="alert">
             <p>{confirming === 'all'
-              ? `Irreversible: this permanently deletes every workspace record owned by your account, including resume versions, applications, analyses, and generated drafts. This cannot be undone.`
+              ? `Irreversible: this permanently deletes every workspace record owned by your account, including resume versions, applications, analyses, generated drafts, saved written practice, and recruiting simulations. Public portfolio settings and recruiter feedback remain unchanged. This cannot be undone.`
               : `This permanently deletes all ${analysisCount} saved role analyses. Resume versions and applications remain unchanged.`}</p>
             <label><span>Type {confirming === 'all' ? 'DELETE ALL' : 'CLEAR'} to confirm</span><input value={confirmationText} onChange={(event) => setConfirmationText(event.target.value)} autoComplete="off" /></label>
             <div><button type="button" className="workspace-button workspace-button-quiet" onClick={() => { setConfirming(null); setConfirmationText(''); }} disabled={deleting}>Cancel</button><button type="button" className="workspace-button workspace-button-danger" onClick={() => void deleteSelectedRecords()} disabled={confirmationText !== (confirming === 'all' ? 'DELETE ALL' : 'CLEAR') || deleting}>{deleting ? 'Deleting…' : confirming === 'all' ? 'Permanently delete all' : 'Clear analysis history'}</button></div>
@@ -1324,11 +1336,23 @@ export default function WorkspacePage() {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const view = getView(location);
+  useEffect(() => {
+    const previousTitle = document.title;
+    const copy = viewCopy[view];
+    document.title = `${copy.eyebrow} — Ketan Bhoi`;
+    const tags = ['meta[name="description"]', 'meta[property="og:title"]', 'meta[property="og:description"]'];
+    const previous = tags.map((selector) => document.querySelector(selector)?.getAttribute('content') ?? '');
+    tags.forEach((selector, i) => document.querySelector(selector)?.setAttribute('content', i === 1 ? document.title : copy.description));
+    return () => {
+      document.title = previousTitle;
+      tags.forEach((selector, i) => document.querySelector(selector)?.setAttribute('content', previous[i]));
+    };
+  }, [view]);
   return (
     <div className="workspace-shell">
       <div className={`workspace-sidebar-wrap ${sidebarOpen ? 'workspace-sidebar-wrap-open' : ''}`}><WorkspaceSidebar view={view} onClose={() => setSidebarOpen(false)} /></div>
       {sidebarOpen && <button className="workspace-sidebar-overlay" type="button" onClick={() => setSidebarOpen(false)} aria-label="Close navigation" data-testid="button-close-sidebar-overlay" />}
-      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}{view === 'studio' && <InterviewStudio />}{view === 'insights' && <PortfolioInsights />}</main></div>
+      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}{view === 'studio' && <InterviewStudio />}{view === 'lab' && <RecruitingLab />}{view === 'practice' && <PracticeHistory />}{view === 'portfolio' && <PortfolioSettings />}{view === 'insights' && <PortfolioInsights />}</main></div>
     </div>
   );
 }

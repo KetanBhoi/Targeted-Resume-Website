@@ -3,6 +3,7 @@ import { Download, Mic, Pause, Play, RotateCcw, SkipForward, Square, Trash2 } fr
 import { useListWorkspaceRecords } from '@workspace/api-client-react';
 import { portfolio } from '@/data/portfolio';
 import { readInterviewQuestions } from '@/lib/workspace-features';
+import { PracticeJournal } from '@/components/practice-journal';
 import '@/styles/interview-studio.css';
 
 type Category = 'HR' | 'Technical' | 'Resume' | 'STAR' | 'Saved';
@@ -170,9 +171,9 @@ export default function InterviewStudio() {
         <h1>Practice out loud, in your own words.</h1>
         <p>
           {portfolio.context} Nothing here is scored or judged by software. Your draft and any recording stay
-          in this browser tab only and are never uploaded.
+          in this browser tab unless you explicitly save written practice below. Audio is never uploaded.
         </p>
-        <p className="studio-warning" role="note">Leaving or refreshing this page erases the draft and recording. Download audio first if you want to keep it.</p>
+        <p className="studio-warning" role="note">Leaving or refreshing erases the draft and recording unless you save the written text. Download audio first if you want to keep it.</p>
       </header>
 
       <div className="studio-tabs" role="tablist">
@@ -239,6 +240,7 @@ export default function InterviewStudio() {
           )}
         </div>
       </section>
+      <PracticeJournal question={q?.text ?? null} category={q?.category ?? cat} limit={limit} answer={draft} checks={checks} />
     </section>
   );
 }
