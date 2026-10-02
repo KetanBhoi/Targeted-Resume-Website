@@ -24,16 +24,20 @@ import { useAskAmbassador, useHealthCheck } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { portfolio, type PortfolioSection } from '@/data/portfolio';
+import { portfolio, portfolio as englishPortfolio, type PortfolioSection } from '@/data/portfolio';
 import NotFound from '@/pages/not-found';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import WorkspacePage from '@/pages/workspace';
 import PortfolioExtras from '@/components/portfolio-extras';
+import PublicCaseStudies from '@/components/public-case-studies';
+import SharedApplication from '@/pages/shared-application';
 import { createUserCacheInvalidator } from '@/lib/user-cache';
 import { RecruiterTools, RecruiterFeedback } from '@/components/recruiter-tools';
 import RecruiterBrief from '@/pages/recruiter-brief';
 import { readPortfolioView, type PortfolioView } from '@/lib/portfolio-view';
 import { trackEvent } from '@/lib/analytics';
+import { PortfolioLanguageProvider, usePortfolioLanguage } from '@/lib/portfolio-language';
+import PortfolioLanguageSwitcher from '@/components/portfolio-language-switcher';
 
 const queryClient = new QueryClient();
 const clerkPubKey = publishableKeyFromHost(
@@ -141,6 +145,7 @@ function AnchorButton({ href, children, muted = false }: { href: string; childre
 }
 
 function Header({ onDownload }: { onDownload: () => void }) {
+  const { t } = usePortfolioLanguage();
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-5 py-3.5 lg:px-10 lg:py-4">
@@ -150,7 +155,7 @@ function Header({ onDownload }: { onDownload: () => void }) {
           </span>
           <span className="hidden font-mono-custom text-[11px] uppercase tracking-[0.14em] text-foreground sm:inline">Ketan Bhoi</span>
         </a>
-        <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
+        <nav aria-label={t('Primary navigation')} className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <a
               key={item.href}
@@ -158,12 +163,13 @@ function Header({ onDownload }: { onDownload: () => void }) {
               className="nav-link px-3 py-2 font-mono-custom text-[10px] uppercase tracking-[0.13em] text-muted-foreground"
               data-testid={`link-nav-${item.href.slice(1)}`}
             >
-              {item.label}
+              {t(item.label)}
             </a>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-        <a href={`${basePath}/workspace`} className="font-mono-custom text-[10px] uppercase tracking-[0.1em]" data-testid="link-private-workspace">Private workspace</a>
+        <PortfolioLanguageSwitcher />
+        <a href={`${basePath}/workspace`} className="font-mono-custom text-[10px] uppercase tracking-[0.1em]" data-testid="link-private-workspace">{t('Private workspace')}</a>
         <button
           type="button"
           onClick={onDownload}
@@ -171,8 +177,8 @@ function Header({ onDownload }: { onDownload: () => void }) {
           data-testid="button-download-resume"
         >
           <Download className="size-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Download resume</span>
-          <span className="sm:hidden">Resume</span>
+          <span className="hidden sm:inline">{t('Download resume')}</span>
+          <span className="sm:hidden">{t('Resume')}</span>
         </button>
         </div>
       </div>
@@ -181,17 +187,18 @@ function Header({ onDownload }: { onDownload: () => void }) {
 }
 
 function Hero({ onDownload }: { onDownload: () => void }) {
+  const { t, portfolio } = usePortfolioLanguage();
   return (
     <section id="about" className="relative border-b border-border paper-grid">
       <div className="mx-auto grid max-w-[1380px] gap-12 px-5 pb-16 pt-14 lg:grid-cols-[1.18fr_.82fr] lg:gap-20 lg:px-10 lg:pb-24 lg:pt-24">
         <div className="reveal">
           <div className="mb-8 inline-flex items-center gap-2 border border-border bg-card/70 px-3 py-2 font-mono-custom text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
             <span className="size-2 rounded-full bg-accent ring-2 ring-accent/30" />
-            Visual resume · recruiter-facing
+            {t('Visual resume · recruiter-facing')}
           </div>
           <h1 className="max-w-4xl font-display text-[clamp(3.3rem,8.4vw,8.1rem)] leading-[.84] tracking-[-0.055em] text-primary">
-            A careful eye<br />
-            <span className="text-muted-foreground">for people</span>
+            {t('A careful eye')}<br />
+            <span className="text-muted-foreground">{t('for people')}</span>
             <span className="text-accent">.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-8 text-muted-foreground lg:text-xl">
@@ -199,7 +206,7 @@ function Hero({ onDownload }: { onDownload: () => void }) {
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <AnchorButton href="#role-fit">
-              See the evidence <ArrowDown className="size-4" aria-hidden="true" />
+              {t('See the evidence')} <ArrowDown className="size-4" aria-hidden="true" />
             </AnchorButton>
             <button
               type="button"
@@ -207,15 +214,15 @@ function Hero({ onDownload }: { onDownload: () => void }) {
               className="inline-flex items-center gap-2 border border-border bg-card/60 px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-secondary"
               data-testid="button-download-resume-hero"
             >
-              <FileText className="size-4" aria-hidden="true" /> Download sanitized resume
+              <FileText className="size-4" aria-hidden="true" /> {t('Download sanitized resume')}
             </button>
           </div>
         </div>
         <div className="reveal reveal-delay-2 flex flex-col justify-end">
           <div className="relative overflow-hidden border border-primary bg-primary p-6 text-primary-foreground shadow-[10px_10px_0_hsl(var(--accent))] sm:p-8">
-            <div className="absolute right-5 top-5 font-mono-custom text-[10px] uppercase tracking-[0.18em] text-primary-foreground/55">01 / intent</div>
+            <div className="absolute right-5 top-5 font-mono-custom text-[10px] uppercase tracking-[0.18em] text-primary-foreground/55">{t('01 / intent')}</div>
             <div className="mb-14 mt-10 max-w-sm">
-              <p className="font-mono-custom text-[10px] uppercase tracking-[0.17em] text-accent">Target role</p>
+              <p className="font-mono-custom text-[10px] uppercase tracking-[0.17em] text-accent">{t('Target role')}</p>
               <p className="mt-3 font-display text-4xl leading-none sm:text-5xl" data-testid="text-target-role">{portfolio.targetRole}</p>
             </div>
             <div className="border-t border-primary-foreground/20 pt-4">
@@ -225,7 +232,7 @@ function Hero({ onDownload }: { onDownload: () => void }) {
           <div className="mt-8 flex items-start gap-3 border-l-2 border-accent pl-4">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
             <p className="max-w-md text-xs leading-5 text-muted-foreground">
-              Built for a fast, fair review: every claim below points back to a named project, role, skill, or credential.
+              {t('Built for a fast, fair review: every claim below points back to a named project, role, skill, or credential.')}
             </p>
           </div>
         </div>
@@ -235,16 +242,17 @@ function Hero({ onDownload }: { onDownload: () => void }) {
 }
 
 function RoleFit() {
+  const { t, portfolio } = usePortfolioLanguage();
   return (
     <section id="role-fit" className="anchor-target mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
-      <SectionLabel index="01">Transferable strengths</SectionLabel>
+      <SectionLabel index="01">{t('Transferable strengths')}</SectionLabel>
       <div className="grid gap-5 lg:grid-cols-[.78fr_1.22fr]">
         <div>
           <h2 className="max-w-md font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">
-            Proof before<br /><span className="text-muted-foreground">promises.</span>
+            {t('Proof before')}<br /><span className="text-muted-foreground">{t('promises.')}</span>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-            The resume does not list direct recruiting experience. It does show patterns that can transfer into recruiting work.
+            {t('The resume does not list direct recruiting experience. It does show patterns that can transfer into recruiting work.')}
           </p>
         </div>
         <div className="grid gap-3">
@@ -268,15 +276,16 @@ function RoleFit() {
 }
 
 function Experience() {
+  const { t, portfolio } = usePortfolioLanguage();
   return (
     <section id="experience" className="anchor-target border-y border-border bg-secondary/55">
       <div className="mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
-        <SectionLabel index="02">Experience + work sample</SectionLabel>
+        <SectionLabel index="02">{t('Experience + work sample')}</SectionLabel>
         <div className="grid gap-12 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
           <div>
-            <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">Work that shows how he thinks.</h2>
+            <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">{t('Work that shows how he thinks.')}</h2>
             <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-              Software development is the documented experience. The useful signal for a recruiter is how Ketan approached structure, ownership, and follow-through.
+              {t('Software development is the documented experience. The useful signal for a recruiter is how Ketan approached structure, ownership, and follow-through.')}
             </p>
           </div>
           <div className="space-y-10">
@@ -301,18 +310,18 @@ function Experience() {
             <article id="projects" className="anchor-target border border-primary bg-primary p-6 text-primary-foreground sm:p-8" data-testid="card-project-metromart">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Work sample / project</p>
+                  <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">{t('Work sample / project')}</p>
                   <h3 className="mt-2 font-display text-4xl">{portfolio.projects[0].name}</h3>
                 </div>
                 <span className="border border-primary-foreground/30 px-2 py-1 font-mono-custom text-[10px] uppercase tracking-[0.1em] text-primary-foreground/70">{portfolio.projects[0].kind}</span>
               </div>
               <div className="mt-5 border-t border-primary-foreground/20 pt-4">
-                <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Project scope, as documented</p>
+                <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">{t('Project scope, as documented')}</p>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-primary-foreground/75">{portfolio.projects[0].problem}</p>
               </div>
               <p className="mt-6 max-w-2xl text-sm leading-6 text-primary-foreground/85">{portfolio.projects[0].contribution}</p>
               <div className="mt-6 border-t border-primary-foreground/20 pt-5">
-                <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Outcome, stated plainly</p>
+                <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">{t('Outcome, stated plainly')}</p>
                 <p className="mt-2 text-sm leading-6 text-primary-foreground/85">{portfolio.projects[0].outcome}</p>
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
@@ -329,15 +338,16 @@ function Experience() {
 }
 
 function Skills() {
+  const { t, portfolio } = usePortfolioLanguage();
   return (
     <section id="skills" className="anchor-target mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
-      <SectionLabel index="03">Skills, without the fog</SectionLabel>
+      <SectionLabel index="03">{t('Skills, without the fog')}</SectionLabel>
       <div className="grid gap-10 lg:grid-cols-[.55fr_1.45fr]">
         <div>
-          <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em]">What he can bring on day one.</h2>
+          <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em]">{t('What he can bring on day one.')}</h2>
           <div className="mt-8 flex flex-wrap gap-2">
-            {portfolio.softSkills.map((skill) => (
-              <span key={skill} className="border border-border bg-secondary px-3 py-2 text-xs font-semibold" data-testid={`tag-soft-skill-${skill.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{skill}</span>
+            {portfolio.softSkills.map((skill, skillIndex) => (
+              <span key={skill} className="border border-border bg-secondary px-3 py-2 text-xs font-semibold" data-testid={`tag-soft-skill-${englishPortfolio.softSkills[skillIndex].toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{skill}</span>
             ))}
           </div>
         </div>
@@ -362,10 +372,11 @@ function Skills() {
 }
 
 function Education() {
+  const { t, portfolio } = usePortfolioLanguage();
   return (
     <section id="education" className="anchor-target border-y border-border bg-primary text-primary-foreground">
       <div className="mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
-        <SectionLabel index="04" inverse>Education + certificates</SectionLabel>
+        <SectionLabel index="04" inverse>{t('Education + certificates')}</SectionLabel>
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
           <div className="space-y-8">
             {portfolio.education.map((item, index) => (
@@ -381,7 +392,7 @@ function Education() {
             ))}
           </div>
           <div className="border border-primary-foreground/20 p-6 sm:p-8">
-            <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">Certificates</p>
+            <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">{t('Certificates')}</p>
             <ul className="mt-6 space-y-4">
               {portfolio.certificates.map((certificate) => (
                 <li key={certificate} className="flex gap-3 text-sm leading-6 text-primary-foreground/85" data-testid={`text-certificate-${certificate.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
@@ -397,6 +408,7 @@ function Education() {
 }
 
 function Ambassador() {
+  const { t } = usePortfolioLanguage();
   const health = useHealthCheck();
   const ask = useAskAmbassador();
   const [question, setQuestion] = useState('');
@@ -416,7 +428,7 @@ function Ambassador() {
           setMessages((current) => [...current, { role: 'assistant', text: answer.answer, section: answer.section }]);
         },
         onError: () => {
-          setMessages((current) => [...current, { role: 'assistant', text: 'The ambassador is unavailable right now. Please use the evidence on this page instead.' }]);
+          setMessages((current) => [...current, { role: 'assistant', text: t('The ambassador is unavailable right now. Please use the evidence on this page instead.') }]);
         },
       },
     );
@@ -431,29 +443,30 @@ function Ambassador() {
     <section id="ambassador" className="anchor-target mx-auto max-w-[1380px] px-5 py-16 lg:px-10 lg:py-24">
       <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
         <div>
-          <SectionLabel index="05">Ask the ambassador</SectionLabel>
-          <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">A direct answer beats a perfect pitch.</h2>
+          <SectionLabel index="05">{t('Ask the ambassador')}</SectionLabel>
+          <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">{t('A direct answer beats a perfect pitch.')}</h2>
           <p className="mt-6 max-w-md text-sm leading-6 text-muted-foreground">
-            Ask about role fit, the MetroMart work sample, metrics, leadership, or anything else in the documented resume.
+            {t('Ask about role fit, the MetroMart work sample, metrics, leadership, or anything else in the documented resume.')}
           </p>
+          <p className="mt-3 max-w-md text-xs leading-5 text-muted-foreground" data-testid="text-ambassador-language-note">{t('Replies are shown exactly as the assistant returns them, in their original language (English by default).')}</p>
           <div className="mt-6 flex items-center gap-2 font-mono-custom text-[10px] uppercase tracking-[0.1em] text-muted-foreground" data-testid="status-ambassador">
             <span className={`size-2 rounded-full ${health.isLoading ? 'bg-muted-foreground' : health.isError ? 'bg-destructive' : 'bg-accent'}`} />
-            {health.isLoading ? 'Checking availability' : health.isError ? 'Currently unavailable' : `Assistant ${health.data?.status ?? 'status unknown'}`}
+            {health.isLoading ? t('Checking availability') : health.isError ? t('Currently unavailable') : `${t('Assistant')} ${health.data?.status ?? t('status unknown')}`}
           </div>
         </div>
         <div className="border border-border bg-card shadow-[8px_8px_0_hsl(var(--secondary))]" data-testid="panel-ambassador">
           <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-6">
             <div className="flex items-center gap-2">
               <MessageCircle className="size-4" aria-hidden="true" />
-              <span className="font-mono-custom text-[10px] uppercase tracking-[0.13em]">Resume Q&A</span>
+              <span className="font-mono-custom text-[10px] uppercase tracking-[0.13em]">{t('Resume Q&A')}</span>
             </div>
-            <span className="font-mono-custom text-[10px] text-muted-foreground">Not saved</span>
+            <span className="font-mono-custom text-[10px] text-muted-foreground">{t('Not saved')}</span>
           </div>
           <div className="chat-scroll max-h-[360px] min-h-[210px] space-y-4 overflow-y-auto p-4 sm:p-6">
             {messages.length === 0 && (
               <div className="flex gap-3 text-sm leading-6 text-muted-foreground">
                 <Sparkles className="mt-1 size-4 shrink-0 text-accent-foreground" aria-hidden="true" />
-                <p>Choose a question to get a grounded answer from the resume facts.</p>
+                <p>{t('Choose a question to get a grounded answer from the resume facts.')}</p>
               </div>
             )}
             {messages.map((message, index) => (
@@ -463,7 +476,7 @@ function Ambassador() {
                   <p>{message.text}</p>
                   {message.role === 'assistant' && message.section && (
                     <button type="button" onClick={() => jumpToSection(message.section)} className="mt-3 inline-flex items-center gap-1 border-b border-primary font-mono-custom text-[10px] uppercase tracking-[0.08em] text-primary" data-testid={`button-jump-${message.section}`}>
-                      View supporting section <ArrowUpRight className="size-3" aria-hidden="true" />
+                      {t('View supporting section')} <ArrowUpRight className="size-3" aria-hidden="true" />
                     </button>
                   )}
                 </div>
@@ -472,7 +485,7 @@ function Ambassador() {
             {ask.isPending && (
               <div className="flex items-center gap-3 text-sm text-muted-foreground" data-testid="status-ambassador-loading">
                 <span className="flex gap-1"><span className="size-1.5 animate-pulse rounded-full bg-accent" /><span className="size-1.5 animate-pulse rounded-full bg-accent [animation-delay:120ms]" /><span className="size-1.5 animate-pulse rounded-full bg-accent [animation-delay:240ms]" /></span>
-                Checking the documented facts…
+                {t('Checking the documented facts…')}
               </div>
             )}
           </div>
@@ -486,22 +499,22 @@ function Ambassador() {
                   className="border border-border px-2.5 py-1.5 text-left font-mono-custom text-[10px] uppercase tracking-[0.06em] text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
                   data-testid={`button-starter-${starter.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                 >
-                  {starter.label}
+                  {t(starter.label)}
                 </button>
               ))}
             </div>
             <form onSubmit={submitQuestion} className="flex gap-2">
-              <label htmlFor="ambassador-question" className="sr-only">Ask the resume ambassador</label>
+              <label htmlFor="ambassador-question" className="sr-only">{t('Ask the resume ambassador')}</label>
               <input
                 id="ambassador-question"
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 maxLength={600}
-                placeholder="Ask a recruiter-minded question…"
+                placeholder={t('Ask a recruiter-minded question…')}
                 className="min-w-0 flex-1 border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                 data-testid="input-ambassador-question"
               />
-              <button type="submit" disabled={!question.trim() || ask.isPending} className="inline-flex size-11 shrink-0 items-center justify-center bg-primary text-primary-foreground transition-colors hover:bg-foreground disabled:cursor-not-allowed disabled:opacity-40" data-testid="button-submit-question" aria-label="Send question">
+              <button type="submit" disabled={!question.trim() || ask.isPending} className="inline-flex size-11 shrink-0 items-center justify-center bg-primary text-primary-foreground transition-colors hover:bg-foreground disabled:cursor-not-allowed disabled:opacity-40" data-testid="button-submit-question" aria-label={t('Send question')}>
                 <Send className="size-4" aria-hidden="true" />
               </button>
             </form>
@@ -513,6 +526,7 @@ function Ambassador() {
 }
 
 function ContactStatus() {
+  const { t, portfolio } = usePortfolioLanguage();
   const hasLinks = Boolean(portfolio.publicLinks.linkedin || portfolio.publicLinks.github || portfolio.publicLinks.additional.length || portfolio.publicContact);
   return (
     <section className="border-t border-border bg-secondary/55">
@@ -520,9 +534,9 @@ function ContactStatus() {
         <div className="flex gap-4">
           {hasLinks ? <ExternalLink className="mt-1 size-4" aria-hidden="true" /> : <CircleAlert className="mt-1 size-4 text-accent-foreground" aria-hidden="true" />}
           <div>
-            <p className="font-mono-custom text-[10px] uppercase tracking-[0.15em]">{hasLinks ? 'Public links' : 'Publishing note'}</p>
+            <p className="font-mono-custom text-[10px] uppercase tracking-[0.15em]">{hasLinks ? t('Public links') : t('Publishing note')}</p>
             <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground" data-testid="text-contact-status">
-              {hasLinks ? 'Public contact and profile links are available below.' : 'Public contact and profile links are not supplied yet. Add them before publishing this portfolio.'}
+              {hasLinks ? t('Public contact and profile links are available below.') : t('Public contact and profile links are not supplied yet. Add them before publishing this portfolio.')}
             </p>
           </div>
         </div>
@@ -539,10 +553,11 @@ function ContactStatus() {
 }
 
 function Footer() {
+  const { t } = usePortfolioLanguage();
   return (
     <footer className="mx-auto flex max-w-[1380px] flex-col gap-2 px-5 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
       <p className="font-display text-2xl">{portfolio.name}</p>
-      <p className="font-mono-custom text-[10px] uppercase tracking-[0.12em] text-muted-foreground">A resume, made easier to verify.</p>
+      <p className="font-mono-custom text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{t('A resume, made easier to verify.')}</p>
     </footer>
   );
 }
@@ -704,6 +719,7 @@ function Home() {
         {view === 'technical' && <><Skills /><Experience /><RoleFit /></>}
         <Education />
         <PortfolioExtras />
+        <PublicCaseStudies />
         <Ambassador />
         <RecruiterFeedback view={view} />
         <ContactStatus />
@@ -765,6 +781,7 @@ function Router() {
         <Route path="/" component={HomeRedirect} />
         <Route path="/portfolio" component={Home} />
         <Route path="/brief" component={RecruiterBrief} />
+        <Route path="/shared" component={SharedApplication} />
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/workspace" component={ProtectedWorkspace} />
@@ -774,6 +791,11 @@ function Router() {
         <Route path="/workspace/studio" component={ProtectedWorkspace} />
         <Route path="/workspace/lab" component={ProtectedWorkspace} />
         <Route path="/workspace/practice" component={ProtectedWorkspace} />
+        <Route path="/workspace/research" component={ProtectedWorkspace} />
+        <Route path="/workspace/network" component={ProtectedWorkspace} />
+        <Route path="/workspace/offers" component={ProtectedWorkspace} />
+        <Route path="/workspace/packs" component={ProtectedWorkspace} />
+        <Route path="/workspace/case-studies" component={ProtectedWorkspace} />
         <Route path="/workspace/portfolio" component={ProtectedWorkspace} />
         <Route path="/workspace/insights" component={ProtectedWorkspace} />
         <Route component={NotFound} />
@@ -817,7 +839,9 @@ function ClerkProviderWithRoutes() {
 function App() {
   return (
     <WouterRouter base={basePath}>
-      <ClerkProviderWithRoutes />
+      <PortfolioLanguageProvider>
+        <ClerkProviderWithRoutes />
+      </PortfolioLanguageProvider>
     </WouterRouter>
   );
 }

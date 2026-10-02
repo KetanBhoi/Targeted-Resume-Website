@@ -411,6 +411,196 @@ export const DeletePortfolioFeedbackResponse = zod.void()
 
 
 /**
+ * @summary List published fictional practice case studies
+ */
+export const ListPublicCaseStudiesResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string(),
+  "summary": zod.string(),
+  "jobDescription": zod.string(),
+  "outreach": zod.string(),
+  "reasoning": zod.string(),
+  "lessons": zod.string(),
+  "label": zod.literal("Fictional recruiting practice—not professional experience"),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListPublicCaseStudiesResponse = zod.array(ListPublicCaseStudiesResponseItem)
+
+
+/**
+ * @summary List private case studies for the verified owner
+ */
+
+export const listOwnerCaseStudiesResponseOneTitleMax = 200;
+
+export const listOwnerCaseStudiesResponseOneSummaryMax = 3000;
+
+export const listOwnerCaseStudiesResponseOneJobDescriptionMax = 10000;
+
+export const listOwnerCaseStudiesResponseOneOutreachMax = 5000;
+
+export const listOwnerCaseStudiesResponseOneReasoningMax = 10000;
+
+export const listOwnerCaseStudiesResponseOneLessonsMax = 5000;
+
+
+
+export const ListOwnerCaseStudiesResponseItem = zod.object({
+  "simulationId": zod.number().int().min(1),
+  "title": zod.string().max(listOwnerCaseStudiesResponseOneTitleMax),
+  "summary": zod.string().max(listOwnerCaseStudiesResponseOneSummaryMax),
+  "jobDescription": zod.string().max(listOwnerCaseStudiesResponseOneJobDescriptionMax),
+  "outreach": zod.string().max(listOwnerCaseStudiesResponseOneOutreachMax),
+  "reasoning": zod.string().max(listOwnerCaseStudiesResponseOneReasoningMax),
+  "lessons": zod.string().max(listOwnerCaseStudiesResponseOneLessonsMax),
+  "fictionalConfirmed": zod.boolean(),
+  "published": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+export const ListOwnerCaseStudiesResponse = zod.array(ListOwnerCaseStudiesResponseItem)
+
+
+/**
+ * @summary Create an owner-reviewed case study from a private simulation
+ */
+
+export const createCaseStudyBodyTitleMax = 200;
+
+export const createCaseStudyBodySummaryMax = 3000;
+
+export const createCaseStudyBodyJobDescriptionMax = 10000;
+
+export const createCaseStudyBodyOutreachMax = 5000;
+
+export const createCaseStudyBodyReasoningMax = 10000;
+
+export const createCaseStudyBodyLessonsMax = 5000;
+
+
+
+export const CreateCaseStudyBody = zod.object({
+  "simulationId": zod.number().int().min(1),
+  "title": zod.string().max(createCaseStudyBodyTitleMax),
+  "summary": zod.string().max(createCaseStudyBodySummaryMax),
+  "jobDescription": zod.string().max(createCaseStudyBodyJobDescriptionMax),
+  "outreach": zod.string().max(createCaseStudyBodyOutreachMax),
+  "reasoning": zod.string().max(createCaseStudyBodyReasoningMax),
+  "lessons": zod.string().max(createCaseStudyBodyLessonsMax),
+  "fictionalConfirmed": zod.boolean(),
+  "published": zod.boolean()
+})
+
+
+export const createCaseStudyResponseOneTitleMax = 200;
+
+export const createCaseStudyResponseOneSummaryMax = 3000;
+
+export const createCaseStudyResponseOneJobDescriptionMax = 10000;
+
+export const createCaseStudyResponseOneOutreachMax = 5000;
+
+export const createCaseStudyResponseOneReasoningMax = 10000;
+
+export const createCaseStudyResponseOneLessonsMax = 5000;
+
+
+
+export const CreateCaseStudyResponse = zod.object({
+  "simulationId": zod.number().int().min(1),
+  "title": zod.string().max(createCaseStudyResponseOneTitleMax),
+  "summary": zod.string().max(createCaseStudyResponseOneSummaryMax),
+  "jobDescription": zod.string().max(createCaseStudyResponseOneJobDescriptionMax),
+  "outreach": zod.string().max(createCaseStudyResponseOneOutreachMax),
+  "reasoning": zod.string().max(createCaseStudyResponseOneReasoningMax),
+  "lessons": zod.string().max(createCaseStudyResponseOneLessonsMax),
+  "fictionalConfirmed": zod.boolean(),
+  "published": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Replace reviewed case study fields for the verified owner
+ */
+export const UpdateCaseStudyParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const updateCaseStudyBodyTitleMax = 200;
+
+export const updateCaseStudyBodySummaryMax = 3000;
+
+export const updateCaseStudyBodyJobDescriptionMax = 10000;
+
+export const updateCaseStudyBodyOutreachMax = 5000;
+
+export const updateCaseStudyBodyReasoningMax = 10000;
+
+export const updateCaseStudyBodyLessonsMax = 5000;
+
+
+
+export const UpdateCaseStudyBody = zod.object({
+  "title": zod.string().max(updateCaseStudyBodyTitleMax),
+  "summary": zod.string().max(updateCaseStudyBodySummaryMax),
+  "jobDescription": zod.string().max(updateCaseStudyBodyJobDescriptionMax),
+  "outreach": zod.string().max(updateCaseStudyBodyOutreachMax),
+  "reasoning": zod.string().max(updateCaseStudyBodyReasoningMax),
+  "lessons": zod.string().max(updateCaseStudyBodyLessonsMax),
+  "fictionalConfirmed": zod.boolean(),
+  "published": zod.boolean()
+})
+
+
+export const updateCaseStudyResponseOneTitleMax = 200;
+
+export const updateCaseStudyResponseOneSummaryMax = 3000;
+
+export const updateCaseStudyResponseOneJobDescriptionMax = 10000;
+
+export const updateCaseStudyResponseOneOutreachMax = 5000;
+
+export const updateCaseStudyResponseOneReasoningMax = 10000;
+
+export const updateCaseStudyResponseOneLessonsMax = 5000;
+
+
+
+export const UpdateCaseStudyResponse = zod.object({
+  "simulationId": zod.number().int().min(1),
+  "title": zod.string().max(updateCaseStudyResponseOneTitleMax),
+  "summary": zod.string().max(updateCaseStudyResponseOneSummaryMax),
+  "jobDescription": zod.string().max(updateCaseStudyResponseOneJobDescriptionMax),
+  "outreach": zod.string().max(updateCaseStudyResponseOneOutreachMax),
+  "reasoning": zod.string().max(updateCaseStudyResponseOneReasoningMax),
+  "lessons": zod.string().max(updateCaseStudyResponseOneLessonsMax),
+  "fictionalConfirmed": zod.boolean(),
+  "published": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Delete a case study for the verified owner
+ */
+export const DeleteCaseStudyParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const DeleteCaseStudyResponse = zod.void()
+
+
+/**
  * Returns server health status
  * @summary Health check
  */
@@ -441,12 +631,12 @@ export const AskAmbassadorResponse = zod.object({
  * @summary List the signed-in user's saved workspace records
  */
 export const ListWorkspaceRecordsQueryParams = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']).optional()
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']).optional()
 })
 
 export const ListWorkspaceRecordsResponseItem = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -457,6 +647,7 @@ export const ListWorkspaceRecordsResponse = zod.array(ListWorkspaceRecordsRespon
 
 
 /**
+ * Application packs cannot be created through this generic endpoint; use POST /workspace/packs.
  * @summary Save a workspace record
  */
 export const createWorkspaceRecordBodyTitleMax = 160;
@@ -466,7 +657,7 @@ export const createWorkspaceRecordBodyContentMax = 50000;
 
 
 export const CreateWorkspaceRecordBody = zod.object({
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer']),
   "title": zod.string().min(1).max(createWorkspaceRecordBodyTitleMax),
   "content": zod.string().max(createWorkspaceRecordBodyContentMax),
   "metadata": zod.record(zod.string(), zod.unknown()).optional().describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n')
@@ -474,7 +665,7 @@ export const CreateWorkspaceRecordBody = zod.object({
 
 export const CreateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -490,7 +681,7 @@ export const ExportWorkspaceDataResponse = zod.object({
   "exportedAt": zod.coerce.date(),
   "records": zod.array(zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -517,6 +708,7 @@ export const DeleteAllWorkspaceRecordsResponse = zod.object({
 
 
 /**
+ * Immutable application pack snapshots cannot be updated.
  * @summary Update one of the signed-in user's records
  */
 
@@ -540,7 +732,7 @@ export const UpdateWorkspaceRecordBody = zod.object({
 
 export const UpdateWorkspaceRecordResponse = zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -614,7 +806,7 @@ export const generateWorkspaceContentResponseOneTwoMetadataBatchIdMax = 100;
 
 export const GenerateWorkspaceContentResponse = zod.union([zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -647,7 +839,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 })
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -667,7 +859,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 }).describe('Complete before/after document comparison for a tailored resume that must be reviewed before use.')
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -683,7 +875,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 }).describe('Follow-up email subject, notes, and tracked application link.')
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -704,7 +896,7 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 })
 })),zod.object({
   "id": zod.number().int(),
-  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice']),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
   "title": zod.string(),
   "content": zod.string(),
   "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
@@ -713,5 +905,158 @@ export const GenerateWorkspaceContentResponse = zod.union([zod.object({
 }).and(zod.object({
   "kind": zod.enum(['cover-letter', 'linkedin'])
 }))])
+
+
+/**
+ * @summary Create an immutable reviewed application snapshot
+ */
+export const createApplicationPackBodyTitleMax = 160;
+
+
+
+export const createApplicationPackBodyBriefMax = 10000;
+
+
+export const createApplicationPackBodyBriefRegExp = new RegExp('.*\\S.*');
+export const createApplicationPackBodyLinksItemLabelMax = 200;
+
+export const createApplicationPackBodyLinksItemUrlMax = 2048;
+
+
+export const createApplicationPackBodyLinksItemUrlRegExp = new RegExp('^https:/');
+export const createApplicationPackBodyLinksMax = 30;
+
+
+
+export const CreateApplicationPackBody = zod.object({
+  "title": zod.string().min(1).max(createApplicationPackBodyTitleMax),
+  "resumeId": zod.number().int().min(1),
+  "coverLetterId": zod.number().int().min(1).nullable(),
+  "brief": zod.string().min(1).max(createApplicationPackBodyBriefMax).regex(createApplicationPackBodyBriefRegExp),
+  "links": zod.array(zod.object({
+  "label": zod.string().max(createApplicationPackBodyLinksItemLabelMax),
+  "url": zod.string().max(createApplicationPackBodyLinksItemUrlMax).regex(createApplicationPackBodyLinksItemUrlRegExp)
+})).max(createApplicationPackBodyLinksMax),
+  "reviewConfirmed": zod.boolean()
+})
+
+
+
+
+
+export const CreateApplicationPackResponse = zod.object({
+  "id": zod.number().int(),
+  "kind": zod.enum(['resume', 'job', 'analysis', 'interview', 'cover-letter', 'linkedin', 'follow-up', 'simulation', 'practice', 'research', 'network', 'offer', 'pack']),
+  "title": zod.string(),
+  "content": zod.string(),
+  "metadata": zod.record(zod.string(), zod.unknown()).describe('Extensible kind-specific data. Generated analysis, tailored resume, follow-up, and interview records use their corresponding typed schemas.\n'),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "kind": zod.literal("pack"),
+  "metadata": zod.object({
+  "reviewed": zod.literal(true),
+  "resumeId": zod.number().int().min(1),
+  "coverLetterId": zod.number().int().min(1).nullable()
+})
+}))
+
+
+/**
+ * @summary List the signed-in user's share records without secrets or snapshots
+ */
+
+
+
+export const ListApplicationSharesResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "packRecordId": zod.number().int().min(1),
+  "title": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "expiresAt": zod.coerce.date(),
+  "revokedAt": zod.coerce.date().nullable()
+})
+export const ListApplicationSharesResponse = zod.array(ListApplicationSharesResponseItem)
+
+
+/**
+ * @summary Create a time-limited, revocable share for an owned pack
+ */
+
+
+
+export const CreateApplicationShareBody = zod.object({
+  "packId": zod.number().int().min(1),
+  "expiresInDays": zod.union([zod.literal(1),zod.literal(7),zod.literal(14),zod.literal(30)]),
+  "sharingConfirmed": zod.boolean()
+})
+
+
+export const createApplicationShareResponseTokenRegExp = new RegExp('^[A-Za-z0-9_-]{43}$');
+
+
+export const CreateApplicationShareResponse = zod.object({
+  "share": zod.object({
+  "id": zod.string().uuid(),
+  "packRecordId": zod.number().int().min(1),
+  "title": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "expiresAt": zod.coerce.date(),
+  "revokedAt": zod.coerce.date().nullable()
+}),
+  "token": zod.string().regex(createApplicationShareResponseTokenRegExp).describe('One-time bearer secret. Store securely; it is not returned by list endpoints.')
+})
+
+
+/**
+ * Responses are not cached/indexed; request bodies and tokens must never be logged.
+ * @summary Resolve a bearer token without placing it in a URL
+ */
+export const resolveApplicationShareBodyTokenRegExp = new RegExp('^[A-Za-z0-9_-]{43}$');
+
+
+export const ResolveApplicationShareBody = zod.object({
+  "token": zod.string().regex(resolveApplicationShareBodyTokenRegExp)
+})
+
+export const resolveApplicationShareResponsePackLinksItemLabelMax = 200;
+
+export const resolveApplicationShareResponsePackLinksItemUrlMax = 2048;
+
+
+export const resolveApplicationShareResponsePackLinksItemUrlRegExp = new RegExp('^https:/');
+
+
+export const ResolveApplicationShareResponse = zod.object({
+  "title": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "pack": zod.object({
+  "title": zod.string(),
+  "resume": zod.object({
+  "title": zod.string(),
+  "content": zod.string()
+}),
+  "coverLetter": zod.object({
+  "title": zod.string(),
+  "content": zod.string()
+}).nullable(),
+  "brief": zod.string(),
+  "links": zod.array(zod.object({
+  "label": zod.string().max(resolveApplicationShareResponsePackLinksItemLabelMax),
+  "url": zod.string().max(resolveApplicationShareResponsePackLinksItemUrlMax).regex(resolveApplicationShareResponsePackLinksItemUrlRegExp)
+})),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+/**
+ * @summary Revoke an owned share without revealing cross-owner existence
+ */
+export const RevokeApplicationShareByIdParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const RevokeApplicationShareByIdResponse = zod.void()
 
 

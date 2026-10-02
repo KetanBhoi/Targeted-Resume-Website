@@ -50,6 +50,11 @@ import PortfolioInsights from '@/pages/portfolio-insights';
 import RecruitingLab from '@/pages/recruiting-lab';
 import PracticeHistory from '@/pages/practice-history';
 import PortfolioSettings from '@/pages/portfolio-settings';
+import CompanyResearch from '@/pages/company-research';
+import Networking from '@/pages/networking';
+import OfferComparison from '@/pages/offer-comparison';
+import ApplicationPacks from '@/pages/application-packs';
+import CaseStudyEditor from '@/pages/case-study-editor';
 import { Link, useLocation } from 'wouter';
 import {
   buildKeywordPreview,
@@ -61,11 +66,16 @@ import {
   readKeywordHeatmap,
 } from '@/lib/workspace-features';
 
-type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare' | 'studio' | 'insights' | 'lab' | 'practice' | 'portfolio';
+type WorkspaceView = 'overview' | 'jobs' | 'match' | 'prepare' | 'studio' | 'insights' | 'lab' | 'practice' | 'portfolio' | 'research' | 'network' | 'offers' | 'packs' | 'case-studies';
 type Meta = Record<string, unknown>;
 type RecordKind = WorkspaceRecordKind;
 
 const viewCopy: Record<WorkspaceView, { eyebrow: string; title: string; description: string }> = {
+  research: { eyebrow: 'Company research', title: 'Prepare with sources.', description: 'Your private company notes, source links, and interview questions.' },
+  network: { eyebrow: 'Networking', title: 'Keep track of conversations.', description: 'Private professional contacts and follow-up dates. Nothing sends automatically.' },
+  offers: { eyebrow: 'Offer comparison', title: 'Compare actual offers.', description: 'Your offer details and priorities, without invented benchmarks or currency conversions.' },
+  packs: { eyebrow: 'Application packs', title: 'Share only what you select.', description: 'Reviewed application snapshots, ZIP downloads, and expiring share links.' },
+  'case-studies': { eyebrow: 'Practice case studies', title: 'Publish practice honestly.', description: 'Owner-reviewed fictional exercises, never professional recruiting experience.' },
   studio: { eyebrow: 'Interview studio', title: 'Practice with a clear timer.', description: 'Local audio and drafts, with optional private saving of written answers.' },
   lab: { eyebrow: 'Recruiting lab', title: 'Learn by practicing.', description: 'Fictional recruiting exercises, never claims of professional experience.' },
   practice: { eyebrow: 'Practice history', title: 'Reflect on your preparation.', description: 'Your privately saved written answers and reflections.' },
@@ -101,11 +111,21 @@ const navItems: { label: string; hint: string; href: string; view: WorkspaceView
   { label: 'Interview studio', hint: 'Timed + local practice', href: '/workspace/studio', view: 'studio', icon: MessageCircle },
   { label: 'Practice history', hint: 'Written answers + reflections', href: '/workspace/practice', view: 'practice', icon: Clock3 },
   { label: 'Recruiting lab', hint: 'Fictional practice exercises', href: '/workspace/lab', view: 'lab', icon: FlaskConical },
+  { label: 'Company research', hint: 'Private notes + sources', href: '/workspace/research', view: 'research', icon: Search },
+  { label: 'Networking', hint: 'Contacts + follow-ups', href: '/workspace/network', view: 'network', icon: MessageCircle },
+  { label: 'Offer comparison', hint: 'Actual offers + priorities', href: '/workspace/offers', view: 'offers', icon: BarChart3 },
+  { label: 'Application packs', hint: 'Downloads + expiring links', href: '/workspace/packs', view: 'packs', icon: Archive },
+  { label: 'Practice case studies', hint: 'Owner-only publishing', href: '/workspace/case-studies', view: 'case-studies', icon: FlaskConical },
   { label: 'Portfolio settings', hint: 'Owner-only public content', href: '/workspace/portfolio', view: 'portfolio', icon: ShieldCheck },
   { label: 'Portfolio insights', hint: 'Owner-only feedback', href: '/workspace/insights', view: 'insights', icon: BarChart3 },
 ];
 
 function getView(path: string): WorkspaceView {
+  if (path.includes('/case-studies')) return 'case-studies';
+  if (path.includes('/research')) return 'research';
+  if (path.includes('/network')) return 'network';
+  if (path.includes('/offers')) return 'offers';
+  if (path.includes('/packs')) return 'packs';
   if (path.includes('/portfolio')) return 'portfolio';
   if (path.includes('/practice')) return 'practice';
   if (path.includes('/lab')) return 'lab';
@@ -301,7 +321,7 @@ function WorkspaceSidebar({ view, onClose }: { view: WorkspaceView; onClose: () 
 
       <div className="workspace-sidebar-label">Workspace</div>
       <nav className="workspace-nav" aria-label="Workspace navigation">
-        {navItems.filter((item) => !['insights', 'portfolio'].includes(item.view) || owner.data?.isOwner).map((item) => {
+        {navItems.filter((item) => !['insights', 'portfolio', 'case-studies'].includes(item.view) || owner.data?.isOwner).map((item) => {
           const Icon = item.icon;
           return (
             <Link
@@ -749,7 +769,7 @@ function PrivacyControls({ records, onChanged }: { records: WorkspaceRecord[]; o
         <ShieldCheck size={19} />
       </div>
       <div className="workspace-privacy-body">
-        <p>Export or remove your private resumes, job descriptions, analyses, generated drafts, saved written practice, and recruiting simulations. Exported files include the saved record content and metadata. Public portfolio settings and recruiter feedback are managed separately.</p>
+        <p>Export or remove your private resumes, applications, generated drafts, written practice, recruiting simulations, research, networking contacts, offer details, and application packs. Exported files include saved record content and metadata, not share tokens. Public portfolio settings, recruiter feedback, and practice case studies are managed separately.</p>
         <div className="workspace-privacy-actions">
           <button type="button" className="workspace-button workspace-button-quiet" onClick={() => void exportData()} disabled={exporting || deleting} data-testid="button-export-workspace"><Download size={15} /> {exporting ? 'Exporting…' : 'Export all as JSON'}</button>
           <button type="button" className="workspace-button workspace-button-quiet" disabled={!analysisCount || deleting} onClick={() => { setConfirming('analysis'); setConfirmationText(''); setNotice(''); setError(''); }} data-testid="button-clear-analysis-history"><Trash2 size={14} /> Clear analysis history <span>{analysisCount}</span></button>
@@ -758,7 +778,7 @@ function PrivacyControls({ records, onChanged }: { records: WorkspaceRecord[]; o
         {confirming && (
           <div className="workspace-privacy-confirm" role="alert">
             <p>{confirming === 'all'
-              ? `Irreversible: this permanently deletes every workspace record owned by your account, including resume versions, applications, analyses, generated drafts, saved written practice, and recruiting simulations. Public portfolio settings and recruiter feedback remain unchanged. This cannot be undone.`
+              ? `Irreversible: this permanently deletes all your private workspace records, including research, contacts, offers, and application packs, and removes your stored share snapshots. All your application share links become unavailable. Public portfolio settings, recruiter feedback, and practice case studies remain unchanged. Recipient downloads cannot be erased. This cannot be undone.`
               : `This permanently deletes all ${analysisCount} saved role analyses. Resume versions and applications remain unchanged.`}</p>
             <label><span>Type {confirming === 'all' ? 'DELETE ALL' : 'CLEAR'} to confirm</span><input value={confirmationText} onChange={(event) => setConfirmationText(event.target.value)} autoComplete="off" /></label>
             <div><button type="button" className="workspace-button workspace-button-quiet" onClick={() => { setConfirming(null); setConfirmationText(''); }} disabled={deleting}>Cancel</button><button type="button" className="workspace-button workspace-button-danger" onClick={() => void deleteSelectedRecords()} disabled={confirmationText !== (confirming === 'all' ? 'DELETE ALL' : 'CLEAR') || deleting}>{deleting ? 'Deleting…' : confirming === 'all' ? 'Permanently delete all' : 'Clear analysis history'}</button></div>
@@ -1352,7 +1372,7 @@ export default function WorkspacePage() {
     <div className="workspace-shell">
       <div className={`workspace-sidebar-wrap ${sidebarOpen ? 'workspace-sidebar-wrap-open' : ''}`}><WorkspaceSidebar view={view} onClose={() => setSidebarOpen(false)} /></div>
       {sidebarOpen && <button className="workspace-sidebar-overlay" type="button" onClick={() => setSidebarOpen(false)} aria-label="Close navigation" data-testid="button-close-sidebar-overlay" />}
-      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}{view === 'studio' && <InterviewStudio />}{view === 'lab' && <RecruitingLab />}{view === 'practice' && <PracticeHistory />}{view === 'portfolio' && <PortfolioSettings />}{view === 'insights' && <PortfolioInsights />}</main></div>
+      <div className="workspace-main"><WorkspaceTopbar view={view} onMenu={() => setSidebarOpen(true)} /><main className="workspace-content">{view === 'overview' && <WorkbenchPage />}{view === 'jobs' && <JobsPage />}{view === 'match' && <MatchPage />}{view === 'prepare' && <PreparePage />}{view === 'studio' && <InterviewStudio />}{view === 'lab' && <RecruitingLab />}{view === 'practice' && <PracticeHistory />}{view === 'research' && <CompanyResearch />}{view === 'network' && <Networking />}{view === 'offers' && <OfferComparison />}{view === 'packs' && <ApplicationPacks />}{view === 'case-studies' && <CaseStudyEditor />}{view === 'portfolio' && <PortfolioSettings />}{view === 'insights' && <PortfolioInsights />}</main></div>
     </div>
   );
 }

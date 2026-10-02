@@ -4,6 +4,8 @@ import ambassadorRouter from "./ambassador";
 import workspaceRouter from "./workspace";
 import portfolioFeedbackRouter from "./portfolio-feedback";
 import portfolioContentRouter from "./portfolio-content";
+import applicationSharesRouter from "./application-shares";
+import caseStudiesRouter from "./case-studies";
 
 const router: IRouter = Router();
 
@@ -12,5 +14,7 @@ router.use(ambassadorRouter);
 router.use(workspaceRouter);
 router.use(portfolioFeedbackRouter);
 router.use(portfolioContentRouter);
+router.use(applicationSharesRouter);
+router.use(caseStudiesRouter);
 
 export default router;

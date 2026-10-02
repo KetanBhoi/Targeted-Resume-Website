@@ -26,3 +26,15 @@ Keep recruiting simulations clearly labeled as fictional practice, never profess
 **Why:** The user selected a fictional recruiting lab and consent-based, owner-approved recommendations. Practice must not misrepresent recruiting experience or expose unapproved endorsements.
 
 **How to apply:** Keep lab records private, use invented candidates, and preserve separate consent, approval, and publication decisions for recommendations.
+
+Public recruiting case studies are separately reviewed fictional practice, not permission to publish the underlying private lab record or claim employment experience.
+
+**Why:** The user selected public fictional recruiting case studies alongside private preparation tools. Publishing a polished example should not expose private scores, reflections, or candidate notes.
+
+**How to apply:** Require an explicit review of the exact public text, retain the fictional-practice disclaimer, and keep publication independent from changes or deletion of private preparation records.
+
+Treat bearer-link fragments as sensitive to client-side analytics, even though HTTP requests and referrers omit them.
+
+**Why:** The inspected published Replit-injected Umami tracker included full URL fragments by default; its injected tag did not enable hash exclusion. Fragment-only links therefore protect server URL logs but do not, by themselves, protect automatic page views.
+
+**How to apply:** Capture and remove application-link fragments synchronously before the app or injected analytics runs, including later fragment navigation. Preserve refresh access in the browser's history entry, not a URL query. Do not add or configure Replit's injected analytics script.

@@ -4,6 +4,7 @@ import type { AddressInfo, Server } from 'node:net';
 
 const mockDbState = vi.hoisted(() => ({
   records: [] as Array<Record<string, unknown>>,
+  shares: [] as Array<Record<string, unknown>>,
   nextId: 1,
 }));
 
@@ -22,35 +23,44 @@ vi.mock('@clerk/express', () => ({
 }));
 
 vi.mock('@workspace/db', async () => {
-  const [{ workspaceRecordsTable }, { PgDialect }] = await Promise.all([
+  const [{ workspaceRecordsTable, applicationSharesTable }, { PgDialect }] = await Promise.all([
     import('@workspace/db/schema'),
     import('drizzle-orm/pg-core'),
   ]);
   const dialect = new PgDialect();
-  const fields = [
-    ['id', 'id'],
-    ['user_id', 'userId'],
-    ['kind', 'kind'],
-  ] as const;
+  const tables = new Map<unknown, string>([
+    [workspaceRecordsTable, 'workspace_records'],
+    [applicationSharesTable, 'application_shares'],
+  ]);
 
-  function matchingRecords(condition: unknown): Array<Record<string, unknown>> {
-    const query = dialect.sqlToQuery(condition as never);
-    return mockDbState.records.filter((record) =>
-      fields.every(([column, property]) => {
-        const match = query.sql.match(
-          new RegExp(`"workspace_records"\\."${column}"\\s*=\\s*\\$(\\d+)`),
-        );
-        return !match || record[property] === query.params[Number(match[1]) - 1];
-      }),
-    );
+  function getTable(table: unknown) {
+    const name = tables.get(table);
+    if (!name) throw new Error('Unexpected table in workspace test database fixture.');
+    return {
+      name,
+      rows: table === workspaceRecordsTable ? mockDbState.records : mockDbState.shares,
+    };
   }
 
-  const db = {
+  function matchingRows(table: unknown, condition: unknown): Array<Record<string, unknown>> {
+    const target = getTable(table);
+    const query = dialect.sqlToQuery(condition as never);
+    const predicates = Array.from(
+      query.sql.matchAll(new RegExp(`"${target.name}"\\."([^"]+)"\\s*=\\s*\\$(\\d+)`, 'g')),
+      (match) => ({
+        property: match[1].replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase()),
+        value: query.params[Number(match[2]) - 1],
+      }),
+    );
+    return target.rows.filter((row) => predicates.every(({ property, value }) => row[property] === value));
+  }
+
+  const db: any = {
     select: () => ({
-      from: () => ({
+      from: (table: unknown) => ({
         where: (condition: unknown) => ({
           orderBy: async () =>
-            matchingRecords(condition)
+            matchingRows(table, condition)
               .slice()
               .sort((a, b) => {
                 const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
@@ -59,15 +69,16 @@ vi.mock('@workspace/db', async () => {
               })
               .map((record) => structuredClone(record)),
           limit: async (count: number) =>
-            matchingRecords(condition)
+            matchingRows(table, condition)
               .slice(0, count)
               .map((record) => structuredClone(record)),
         }),
       }),
     }),
-    insert: () => ({
+    insert: (table: unknown) => ({
       values: (values: Record<string, unknown>) => ({
         returning: async () => {
+          const target = getTable(table);
           const now = new Date();
           const record = {
             ...values,
@@ -75,16 +86,16 @@ vi.mock('@workspace/db', async () => {
             createdAt: now,
             updatedAt: now,
           };
-          mockDbState.records.push(record);
+          target.rows.push(record);
           return [structuredClone(record)];
         },
       }),
     }),
-    update: () => ({
+    update: (table: unknown) => ({
       set: (values: Record<string, unknown>) => ({
         where: (condition: unknown) => ({
           returning: async () => {
-            const record = matchingRecords(condition)[0];
+            const record = matchingRows(table, condition)[0];
             if (!record) return [];
             Object.assign(record, values);
             return [structuredClone(record)];
@@ -92,19 +103,37 @@ vi.mock('@workspace/db', async () => {
         }),
       }),
     }),
-    delete: () => ({
+    delete: (table: unknown) => ({
       where: (condition: unknown) => ({
-        returning: async () => {
-          const matches = matchingRecords(condition);
-          const ids = new Set(matches.map((record) => record.id));
-          mockDbState.records = mockDbState.records.filter((record) => !ids.has(record.id));
-          return matches.map((record) => ({ id: record.id }));
-        },
+        returning: async () => deleteMatchingRows(table, condition),
+        then: (resolve: (result: Array<Record<string, unknown>>) => unknown) =>
+          Promise.resolve(deleteMatchingRows(table, condition)).then(resolve),
       }),
     }),
+    transaction: async (callback: (tx: unknown) => Promise<unknown>) => {
+      const recordsBefore = structuredClone(mockDbState.records);
+      const sharesBefore = structuredClone(mockDbState.shares);
+      try {
+        return await callback(db);
+      } catch (error) {
+        mockDbState.records = recordsBefore;
+        mockDbState.shares = sharesBefore;
+        throw error;
+      }
+    },
   };
 
-  return { db, workspaceRecordsTable };
+  function deleteMatchingRows(table: unknown, condition: unknown) {
+    const target = getTable(table);
+    const matches = matchingRows(table, condition);
+    const ids = new Set(matches.map((record) => record.id));
+    target.rows = target.rows.filter((record) => !ids.has(record.id));
+    if (table === workspaceRecordsTable) mockDbState.records = target.rows;
+    if (table === applicationSharesTable) mockDbState.shares = target.rows;
+    return matches.map((record) => ({ id: record.id }));
+  }
+
+  return { db, workspaceRecordsTable, applicationSharesTable };
 });
 
 vi.mock('@workspace/integrations-openai-ai-server', () => ({
@@ -156,6 +185,7 @@ afterAll(async () => {
 
 beforeEach(() => {
   mockDbState.records = [];
+  mockDbState.shares = [];
   mockDbState.nextId = 1;
   mockGenerationState.response = '';
   mockGenerationState.calls = 0;
@@ -256,6 +286,30 @@ describe('workspace API authentication and ownership', () => {
     const firstB = await createAs('privacy-user-b', 'B private');
     const recordA = await firstA.json() as { id: number };
     const recordB = await firstB.json() as { id: number };
+    mockDbState.shares.push(
+      {
+        id: 'share-user-a',
+        userId: 'privacy-user-a',
+        packRecordId: recordA.id,
+        title: 'Private A pack',
+        snapshot: { resume: { content: 'A private resume' } },
+        tokenHash: 'a'.repeat(64),
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 86_400_000),
+        revokedAt: null,
+      },
+      {
+        id: 'share-user-b',
+        userId: 'privacy-user-b',
+        packRecordId: recordB.id,
+        title: 'Private B pack',
+        snapshot: { resume: { content: 'B private resume' } },
+        tokenHash: 'b'.repeat(64),
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 86_400_000),
+        revokedAt: null,
+      },
+    );
 
     const exportA = await request('/api/workspace/export', { userId: 'privacy-user-a' });
     const exportedA = await exportA.json() as {
@@ -295,10 +349,61 @@ describe('workspace API authentication and ownership', () => {
     });
     expect(deleteA.status).toBe(200);
     expect(await deleteA.json()).toEqual({ deletedCount: 2 });
+    expect(mockDbState.shares.map((share) => share.id)).toEqual(['share-user-b']);
+    expect(mockDbState.shares[0].snapshot).toEqual({ resume: { content: 'B private resume' } });
     expect((await (await request('/api/workspace/export', { userId: 'privacy-user-a' })).json()).records)
       .toEqual([]);
     expect((await (await request('/api/workspace/export', { userId: 'privacy-user-b' })).json()).records)
       .toHaveLength(1);
+  });
+
+  it('purges only the deleted owner pack shares and their copied snapshots', async () => {
+    const now = new Date();
+    mockDbState.records.push({
+      id: 41,
+      userId: 'pack-owner',
+      kind: 'pack',
+      title: 'Application pack',
+      content: JSON.stringify({ resume: { content: 'Private snapshot' } }),
+      metadata: { reviewed: true, resumeId: 7, coverLetterId: null },
+      createdAt: now,
+      updatedAt: now,
+    });
+    mockDbState.shares.push(
+      {
+        id: 'pack-owner-share',
+        userId: 'pack-owner',
+        packRecordId: 41,
+        title: 'Application pack',
+        snapshot: { resume: { content: 'Private snapshot' } },
+        tokenHash: 'c'.repeat(64),
+        createdAt: now,
+        expiresAt: new Date(now.getTime() + 86_400_000),
+        revokedAt: null,
+      },
+      {
+        id: 'other-owner-share',
+        userId: 'other-owner',
+        packRecordId: 41,
+        title: 'Other account snapshot',
+        snapshot: { resume: { content: 'Do not delete other account data' } },
+        tokenHash: 'd'.repeat(64),
+        createdAt: now,
+        expiresAt: new Date(now.getTime() + 86_400_000),
+        revokedAt: null,
+      },
+    );
+
+    const deleted = await request('/api/workspace/records/41', {
+      userId: 'pack-owner',
+      method: 'DELETE',
+    });
+    expect(deleted.status).toBe(204);
+    expect(mockDbState.records).toEqual([]);
+    expect(mockDbState.shares.map((share) => share.id)).toEqual(['other-owner-share']);
+    expect(mockDbState.shares[0].snapshot).toEqual({
+      resume: { content: 'Do not delete other account data' },
+    });
   });
 
   it('validates linked source ownership and record kinds before calling the model', async () => {

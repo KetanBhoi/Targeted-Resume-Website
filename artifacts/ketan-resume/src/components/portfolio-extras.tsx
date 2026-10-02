@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, Check } from 'lucide-react';
 import { getGetPublicPortfolioContentQueryKey, useGetPublicPortfolioContent } from '@workspace/api-client-react';
+import { usePortfolioLanguage } from '@/lib/portfolio-language';
 import '@/styles/portfolio-content.css';
 
 function isHttps(url: string): boolean {
@@ -22,6 +23,8 @@ function fmtDate(value: string): string {
 }
 
 export default function PortfolioExtras() {
+  const { t, language } = usePortfolioLanguage();
+  const originalNote = language !== 'en' ? <p className="pc-mono mt-3" data-testid="text-original-language-note">{t('Shown in the original language supplied by the owner.')}</p> : null;
   const q = useGetPublicPortfolioContent({ query: { queryKey: getGetPublicPortfolioContentQueryKey() } });
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function PortfolioExtras() {
   if (q.isError) {
     return (
       <p className="pc-mono mx-auto max-w-[1380px] px-5 py-4 lg:px-10" role="alert" data-testid="status-portfolio-extras-error">
-        Extra portfolio details did not load. <button type="button" className="pc-retry" onClick={() => q.refetch()} data-testid="button-portfolio-extras-retry">Retry</button>
+        {t('Extra portfolio details did not load.')} <button type="button" className="pc-retry" onClick={() => q.refetch()} data-testid="button-portfolio-extras-retry">{t('Retry')}</button>
       </p>
     );
   }
@@ -44,10 +47,10 @@ export default function PortfolioExtras() {
   const showBooking = b.enabled && isHttps(b.url);
   const hostZone = validZone(b.timezone) ? b.timezone : '';
   const availFields = [
-    ['Roles', a.roles],
-    ['Work arrangement', a.workArrangement],
-    ['Locations', a.locations],
-    ['Joining', a.joining],
+    [t('Roles'), a.roles],
+    [t('Work arrangement'), a.workArrangement],
+    [t('Locations'), a.locations],
+    [t('Joining'), a.joining],
   ].filter(([, v]) => v.trim());
   const showAvail = a.published && availFields.length > 0;
   const certs = c.certificates.filter((x) => x.published && x.title.trim());
@@ -59,21 +62,22 @@ export default function PortfolioExtras() {
         <section id="booking" className="anchor-target pc-section bg-secondary/55" data-testid="section-booking">
           <div className="pc-wrap pc-grid">
             <div>
-              <p className="pc-mono">Book a conversation</p>
-              <h2 className="pc-h2 mt-3">Pick a time that suits you.</h2>
-              <p className="pc-lead">Scheduling happens on an external provider's page. This site does not reserve slots itself.</p>
+              <p className="pc-mono">{t('Book a conversation')}</p>
+              <h2 className="pc-h2 mt-3">{t('Pick a time that suits you.')}</h2>
+              <p className="pc-lead">{t("Scheduling happens on an external provider's page. This site does not reserve slots itself.")}</p>
+              {originalNote}
             </div>
             <div className="pc-list">
               {b.availability.trim() && <p className="whitespace-pre-wrap text-sm leading-6" data-testid="text-booking-availability">{b.availability}</p>}
               {hostZone && (
                 <div className="pc-times" data-testid="list-booking-times">
-                  <div className="pc-time"><span className="pc-mono">Host: {hostZone}</span><strong data-testid="text-time-host">{fmtTime(now, hostZone)}</strong></div>
-                  <div className="pc-time"><span className="pc-mono">You: {Intl.DateTimeFormat().resolvedOptions().timeZone}</span><strong data-testid="text-time-viewer">{fmtTime(now)}</strong></div>
+                  <div className="pc-time"><span className="pc-mono">{t('Host')}: {hostZone}</span><strong data-testid="text-time-host">{fmtTime(now, hostZone)}</strong></div>
+                  <div className="pc-time"><span className="pc-mono">{t('You')}: {Intl.DateTimeFormat().resolvedOptions().timeZone}</span><strong data-testid="text-time-viewer">{fmtTime(now)}</strong></div>
                 </div>
               )}
               <div>
                 <a href={b.url} target="_blank" rel="noopener noreferrer" className="pc-btn" data-testid="link-booking">
-                  Open scheduling page <ExternalLink className="size-3.5" aria-hidden="true" />
+                  {t('Open scheduling page')} <ExternalLink className="size-3.5" aria-hidden="true" />
                 </a>
               </div>
             </div>
@@ -84,8 +88,9 @@ export default function PortfolioExtras() {
         <section id="hiring-availability" className="anchor-target pc-section" data-testid="section-hiring-availability">
           <div className="pc-wrap pc-grid">
             <div>
-              <p className="pc-mono">Hiring availability</p>
-              <h2 className="pc-h2 mt-3">What Ketan is open to.</h2>
+              <p className="pc-mono">{t('Hiring availability')}</p>
+              <h2 className="pc-h2 mt-3">{t('What Ketan is open to.')}</h2>
+              {originalNote}
             </div>
             <dl className="pc-two">
               {availFields.map(([label, value]) => (
@@ -102,8 +107,9 @@ export default function PortfolioExtras() {
         <section id="credentials" className="anchor-target pc-section bg-secondary/55" data-testid="section-credentials">
           <div className="pc-wrap pc-grid">
             <div>
-              <p className="pc-mono">Additional credentials</p>
-              <h2 className="pc-h2 mt-3">Detailed credentials.</h2>
+              <p className="pc-mono">{t('Additional credentials')}</p>
+              <h2 className="pc-h2 mt-3">{t('Detailed credentials.')}</h2>
+              {originalNote}
             </div>
             <ul className="pc-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {certs.map((x) => (
@@ -115,7 +121,7 @@ export default function PortfolioExtras() {
                       <p className="pc-mono mt-2">{[x.issuer, x.completed && fmtDate(x.completed)].filter(Boolean).join(' / ')}</p>
                       {isHttps(x.verificationUrl) && (
                         <a href={x.verificationUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 border-b border-primary text-xs font-bold" data-testid={`link-verify-${x.id}`}>
-                          Verify credential <ExternalLink className="size-3" aria-hidden="true" />
+                          {t('Verify credential')} <ExternalLink className="size-3" aria-hidden="true" />
                         </a>
                       )}
                     </div>
@@ -130,8 +136,9 @@ export default function PortfolioExtras() {
         <section id="recommendations" className="anchor-target pc-section" data-testid="section-recommendations">
           <div className="pc-wrap pc-grid">
             <div>
-              <p className="pc-mono">Recommendations</p>
-              <h2 className="pc-h2 mt-3">In their words.</h2>
+              <p className="pc-mono">{t('Recommendations')}</p>
+              <h2 className="pc-h2 mt-3">{t('In their words.')}</h2>
+              {originalNote}
             </div>
             <div className="pc-list">
               {recs.map((x) => (

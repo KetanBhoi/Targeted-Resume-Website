@@ -201,6 +201,28 @@ export const WorkspaceRecordKind = {
   'follow-up': 'follow-up',
   simulation: 'simulation',
   practice: 'practice',
+  research: 'research',
+  network: 'network',
+  offer: 'offer',
+  pack: 'pack',
+} as const;
+
+export type WorkspaceRecordCreateKind = typeof WorkspaceRecordCreateKind[keyof typeof WorkspaceRecordCreateKind];
+
+
+export const WorkspaceRecordCreateKind = {
+  resume: 'resume',
+  job: 'job',
+  analysis: 'analysis',
+  interview: 'interview',
+  'cover-letter': 'cover-letter',
+  linkedin: 'linkedin',
+  'follow-up': 'follow-up',
+  simulation: 'simulation',
+  practice: 'practice',
+  research: 'research',
+  network: 'network',
+  offer: 'offer',
 } as const;
 
 /**
@@ -240,7 +262,7 @@ export interface WorkspaceDeleteAllResult {
 }
 
 export interface WorkspaceRecordInput {
-  kind: WorkspaceRecordKind;
+  kind: WorkspaceRecordCreateKind;
   /**
      * @minLength 1
      * @maxLength 160
@@ -480,6 +502,335 @@ export interface WorkspaceInterviewMetadata {
   /** @minItems 1 */
   questions: WorkspaceInterviewQuestion[];
   questionsToAsk: string[];
+}
+
+export interface ResearchSource {
+  /** @maxLength 200 */
+  label: string;
+  /**
+     * @maxLength 2048
+     * @pattern ^$|^https://
+     */
+  url: string;
+  /**
+     * @maxLength 10
+     * @pattern ^$|^\d{4}-\d{2}-\d{2}$
+     */
+  checkedOn: string;
+}
+
+export interface WorkspaceResearchMetadata {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  companyName: string;
+  /** @maxLength 200 */
+  role: string;
+  /** @maxItems 30 */
+  sources: ResearchSource[];
+  /**
+     * @maxItems 30
+     * @items.maxLength 2000
+     */
+  questions: string[];
+  /**
+     * @maxItems 30
+     * @items.maxLength 2000
+     */
+  reasons: string[];
+}
+
+export type WorkspaceNetworkMetadataStatus = typeof WorkspaceNetworkMetadataStatus[keyof typeof WorkspaceNetworkMetadataStatus];
+
+
+export const WorkspaceNetworkMetadataStatus = {
+  planned: 'planned',
+  contacted: 'contacted',
+  replied: 'replied',
+  paused: 'paused',
+} as const;
+
+export interface WorkspaceNetworkMetadata {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  name: string;
+  /** @maxLength 200 */
+  organization: string;
+  /** @maxLength 200 */
+  role: string;
+  /**
+     * @maxLength 320
+     * @pattern ^$|^[^\s@]+@[^\s@]+\.[^\s@]+$
+     */
+  email: string;
+  /**
+     * @maxLength 2048
+     * @pattern ^$|^https://
+     */
+  profileUrl: string;
+  /**
+     * @maxLength 10
+     * @pattern ^$|^\d{4}-\d{2}-\d{2}$
+     */
+  lastContact: string;
+  /**
+     * @maxLength 10
+     * @pattern ^$|^\d{4}-\d{2}-\d{2}$
+     */
+  nextFollowUp: string;
+  status: WorkspaceNetworkMetadataStatus;
+}
+
+export type WorkspaceOfferMetadataCurrency = typeof WorkspaceOfferMetadataCurrency[keyof typeof WorkspaceOfferMetadataCurrency];
+
+
+export const WorkspaceOfferMetadataCurrency = {
+  INR: 'INR',
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+  CAD: 'CAD',
+  AUD: 'AUD',
+} as const;
+
+export interface OfferRatings {
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  salary: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  benefits: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  location: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  hours: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  growth: number;
+}
+
+export interface WorkspaceOfferMetadata {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  company: string;
+  /** @maxLength 200 */
+  role: string;
+  currency: WorkspaceOfferMetadataCurrency;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  annualSalary: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  annualBonus: number | null;
+  /**
+     * @exclusiveMinimum 0
+     * @nullable
+     */
+  hoursPerWeek: number | null;
+  /** @maxLength 200 */
+  location: string;
+  /** @maxLength 100 */
+  arrangement: string;
+  /** @maxLength 5000 */
+  benefits: string;
+  ratings: OfferRatings;
+}
+
+export interface WorkspacePackMetadata {
+  reviewed: true;
+  /** @minimum 1 */
+  resumeId: number;
+  /**
+     * @minimum 1
+     * @nullable
+     */
+  coverLetterId: number | null;
+}
+
+export type ApplicationPackRecord = WorkspaceRecord & {
+  kind: 'pack';
+  metadata: WorkspacePackMetadata;
+};
+
+export interface ApplicationPackLink {
+  /** @maxLength 200 */
+  label: string;
+  /**
+     * @maxLength 2048
+     * @pattern ^https://
+     */
+  url: string;
+}
+
+export interface ApplicationPackInput {
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  title: string;
+  /** @minimum 1 */
+  resumeId: number;
+  /**
+     * @minimum 1
+     * @nullable
+     */
+  coverLetterId: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 10000
+     * @pattern .*\S.*
+     */
+  brief: string;
+  /** @maxItems 30 */
+  links: ApplicationPackLink[];
+  reviewConfirmed: boolean;
+}
+
+export type ApplicationPackSnapshotResume = {
+  title: string;
+  content: string;
+};
+
+/**
+ * @nullable
+ */
+export type ApplicationPackSnapshotCoverLetter = {
+  title: string;
+  content: string;
+} | null;
+
+export interface ApplicationPackSnapshot {
+  title: string;
+  resume: ApplicationPackSnapshotResume;
+  /** @nullable */
+  coverLetter: ApplicationPackSnapshotCoverLetter;
+  brief: string;
+  links: ApplicationPackLink[];
+  createdAt: string;
+}
+
+export type ApplicationShareInputExpiresInDays = typeof ApplicationShareInputExpiresInDays[keyof typeof ApplicationShareInputExpiresInDays];
+
+
+export const ApplicationShareInputExpiresInDays = {
+  NUMBER_1: 1,
+  NUMBER_7: 7,
+  NUMBER_14: 14,
+  NUMBER_30: 30,
+} as const;
+
+export interface ApplicationShareInput {
+  /** @minimum 1 */
+  packId: number;
+  expiresInDays: ApplicationShareInputExpiresInDays;
+  sharingConfirmed: boolean;
+}
+
+export interface ApplicationShare {
+  id: string;
+  /** @minimum 1 */
+  packRecordId: number;
+  title: string;
+  createdAt: string;
+  expiresAt: string;
+  /** @nullable */
+  revokedAt: string | null;
+}
+
+export interface CreatedApplicationShare {
+  share: ApplicationShare;
+  /**
+     * One-time bearer secret. Store securely; it is not returned by list endpoints.
+     * @pattern ^[A-Za-z0-9_-]{43}$
+     */
+  token: string;
+}
+
+export interface ShareTokenInput {
+  /** @pattern ^[A-Za-z0-9_-]{43}$ */
+  token: string;
+}
+
+export interface ResolvedApplicationShare {
+  title: string;
+  expiresAt: string;
+  pack: ApplicationPackSnapshot;
+}
+
+export interface CaseStudyInput {
+  /** @minimum 1 */
+  simulationId: number;
+  /** @maxLength 200 */
+  title: string;
+  /** @maxLength 3000 */
+  summary: string;
+  /** @maxLength 10000 */
+  jobDescription: string;
+  /** @maxLength 5000 */
+  outreach: string;
+  /** @maxLength 10000 */
+  reasoning: string;
+  /** @maxLength 5000 */
+  lessons: string;
+  fictionalConfirmed: boolean;
+  published: boolean;
+}
+
+export interface CaseStudyUpdate {
+  /** @maxLength 200 */
+  title: string;
+  /** @maxLength 3000 */
+  summary: string;
+  /** @maxLength 10000 */
+  jobDescription: string;
+  /** @maxLength 5000 */
+  outreach: string;
+  /** @maxLength 10000 */
+  reasoning: string;
+  /** @maxLength 5000 */
+  lessons: string;
+  fictionalConfirmed: boolean;
+  published: boolean;
+}
+
+export type OwnerCaseStudy = CaseStudyInput & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface PublicCaseStudy {
+  id: string;
+  title: string;
+  summary: string;
+  jobDescription: string;
+  outreach: string;
+  reasoning: string;
+  lessons: string;
+  label: 'Fictional recruiting practice—not professional experience';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type WorkspaceGeneratedAnalysisRecordKind = typeof WorkspaceGeneratedAnalysisRecordKind[keyof typeof WorkspaceGeneratedAnalysisRecordKind];

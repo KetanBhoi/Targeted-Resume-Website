@@ -19,4 +19,8 @@ export const WorkspaceRecordKind = {
   'follow-up': 'follow-up',
   simulation: 'simulation',
   practice: 'practice',
+  research: 'research',
+  network: 'network',
+  offer: 'offer',
+  pack: 'pack',
 } as const;

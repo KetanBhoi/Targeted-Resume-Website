@@ -6,6 +6,23 @@
     <title>Ketan Bhoi — Recruiter Portfolio</title>
     <meta name="description" content="Ketan Bhoi — Recruiter Portfolio — built on Replit. Update this description to reflect the app." />
     <meta name="robots" content="index, follow" />
+    <script id="application-share-privacy">
+      // Run synchronously, before the app and injected page-view analytics.
+      // Browser-history state survives a reload without putting the secret in a URL.
+      (function () {
+        var sharedPath = "%BASE_URL%".replace(/\/$/, "") + "/shared";
+        function captureShareToken() {
+          if (location.pathname.replace(/\/$/, "") !== sharedPath || !location.hash) return;
+          var previous = history.state && typeof history.state === "object" ? history.state : {};
+          var state = Object.assign({}, previous, { careerApplicationShareToken: location.hash.slice(1) });
+          history.replaceState(state, "", location.pathname + location.search);
+        }
+        // Capture before analytics listeners when another link changes this tab's fragment.
+        window.addEventListener("hashchange", captureShareToken, true);
+        window.addEventListener("popstate", captureShareToken, true);
+        captureShareToken();
+      })();
+    </script>
     <meta property="og:title" content="Ketan Bhoi — Recruiter Portfolio" />
     <meta property="og:description" content="Ketan Bhoi — Recruiter Portfolio — built on Replit. Update this description to reflect the app." />
     <meta property="og:type" content="website" />

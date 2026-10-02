@@ -13,12 +13,15 @@ import {
   UpdateWorkspaceRecordBody,
   UpdateWorkspaceRecordParams,
   UpdateWorkspaceRecordResponse,
+  CreateApplicationPackBody,
+  CreateApplicationPackResponse,
 } from "@workspace/api-zod";
-import { db, workspaceRecordsTable } from "@workspace/db";
+import { db, applicationSharesTable, workspaceRecordsTable } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { and, desc, eq } from "drizzle-orm";
 import { Router, type IRouter, type Request } from "express";
 import { isValidWorkspaceKindMetadata } from "../lib/workspace-record-metadata";
+import { isPackSourceFactReviewed } from "../lib/application-pack-policy";
 
 const router: IRouter = Router();
 const generationRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -43,6 +46,15 @@ function stringList(value: unknown): string[] | null {
     value.length <= 16
     ? value
     : null;
+}
+
+function isSafeHttpsUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
 }
 
 const interviewCategories = ["HR", "Technical", "Resume", "JD", "STAR"] as const;
@@ -320,6 +332,10 @@ router.post("/workspace/records", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Provide valid metadata for this workspace record kind." });
     return;
   }
+  if ((parsed.data.kind as string) === "pack") {
+    res.status(400).json({ error: "Application packs can only be created through the reviewed pack endpoint." });
+    return;
+  }
 
   const [record] = await db
     .insert(workspaceRecordsTable)
@@ -346,10 +362,13 @@ router.post("/workspace/delete-all", async (req, res): Promise<void> => {
     return;
   }
 
-  const deleted = await db
-    .delete(workspaceRecordsTable)
-    .where(eq(workspaceRecordsTable.userId, userId))
-    .returning({ id: workspaceRecordsTable.id });
+  const deleted = await db.transaction(async (tx) => {
+    await tx.delete(applicationSharesTable)
+      .where(eq(applicationSharesTable.userId, userId));
+    return tx.delete(workspaceRecordsTable)
+      .where(eq(workspaceRecordsTable.userId, userId))
+      .returning({ id: workspaceRecordsTable.id });
+  });
   res.json(DeleteAllWorkspaceRecordsResponse.parse({ deletedCount: deleted.length }));
 });
 
@@ -378,6 +397,10 @@ router.patch("/workspace/records/:id", async (req, res): Promise<void> => {
     .limit(1);
   if (!existing) {
     res.status(404).json({ error: "Record not found." });
+    return;
+  }
+  if (existing.kind === "pack") {
+    res.status(400).json({ error: "Application pack snapshots are immutable." });
     return;
   }
   const mergedMetadata = parsed.data.metadata ?? existing.metadata;
@@ -414,20 +437,99 @@ router.delete("/workspace/records/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Invalid record ID." });
     return;
   }
-  const [deleted] = await db
-    .delete(workspaceRecordsTable)
-    .where(
-      and(
-        eq(workspaceRecordsTable.id, params.data.id),
-        eq(workspaceRecordsTable.userId, userId),
-      ),
-    )
-    .returning({ id: workspaceRecordsTable.id });
+  const [deleted] = await db.transaction(async (tx) => {
+    const [owned] = await tx.select({ id: workspaceRecordsTable.id, kind: workspaceRecordsTable.kind })
+      .from(workspaceRecordsTable)
+      .where(and(eq(workspaceRecordsTable.id, params.data.id), eq(workspaceRecordsTable.userId, userId)))
+      .limit(1);
+    if (!owned) return [undefined];
+    if (owned.kind === "pack") {
+      await tx.delete(applicationSharesTable)
+        .where(and(
+          eq(applicationSharesTable.userId, userId),
+          eq(applicationSharesTable.packRecordId, owned.id),
+        ));
+    }
+    return tx.delete(workspaceRecordsTable)
+      .where(and(eq(workspaceRecordsTable.id, owned.id), eq(workspaceRecordsTable.userId, userId)))
+      .returning({ id: workspaceRecordsTable.id });
+  });
   if (!deleted) {
     res.status(404).json({ error: "Record not found." });
     return;
   }
   res.sendStatus(204);
+});
+
+router.post("/workspace/packs", async (req, res): Promise<void> => {
+  const userId = userIdFromRequest(req);
+  if (!userId) {
+    res.status(401).json({ error: "Authentication required." });
+    return;
+  }
+  const parsed = CreateApplicationPackBody.safeParse(req.body);
+  if (
+    !parsed.success ||
+    !parsed.data.reviewConfirmed ||
+    !parsed.data.brief.trim() ||
+    !parsed.data.links.every((link) => isSafeHttpsUrl(link.url))
+  ) {
+    res.status(400).json({ error: "Confirm review and provide valid selected content." });
+    return;
+  }
+  const input = parsed.data;
+  const sourceRows = await db.select().from(workspaceRecordsTable).where(
+    and(
+      eq(workspaceRecordsTable.userId, userId),
+      eq(workspaceRecordsTable.id, input.resumeId),
+    ),
+  ).limit(1);
+  const resume = sourceRows[0];
+  if (!resume || resume.kind !== "resume") {
+    res.status(404).json({ error: "Selected resume not found." });
+    return;
+  }
+  if (!isPackSourceFactReviewed(resume.metadata)) {
+    res.status(409).json({ error: "Review and verify the selected resume before creating a pack." });
+    return;
+  }
+  let coverLetter: typeof workspaceRecordsTable.$inferSelect | null = null;
+  if (input.coverLetterId !== null) {
+    const [record] = await db.select().from(workspaceRecordsTable).where(
+      and(
+        eq(workspaceRecordsTable.userId, userId),
+        eq(workspaceRecordsTable.id, input.coverLetterId),
+      ),
+    ).limit(1);
+    if (!record || record.kind !== "cover-letter") {
+      res.status(404).json({ error: "Selected cover letter not found." });
+      return;
+    }
+    if (!isPackSourceFactReviewed(record.metadata)) {
+      res.status(409).json({ error: "Review and verify the selected cover letter before creating a pack." });
+      return;
+    }
+    coverLetter = record;
+  }
+  const createdAt = new Date();
+  const snapshot = {
+    title: input.title.trim(),
+    resume: { title: resume.title, content: resume.content },
+    coverLetter: coverLetter ? { title: coverLetter.title, content: coverLetter.content } : null,
+    brief: input.brief.trim(),
+    links: input.links,
+    createdAt: createdAt.toISOString(),
+  };
+  const [record] = await db.insert(workspaceRecordsTable).values({
+    userId,
+    kind: "pack",
+    title: input.title.trim(),
+    content: JSON.stringify(snapshot),
+    metadata: { reviewed: true, resumeId: resume.id, coverLetterId: coverLetter?.id ?? null },
+    createdAt,
+    updatedAt: createdAt,
+  }).returning();
+  res.status(201).json(CreateApplicationPackResponse.parse(record));
 });
 
 router.post("/workspace/generate", async (req, res): Promise<void> => {

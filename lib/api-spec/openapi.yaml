@@ -188,6 +188,86 @@ paths:
           description: Note not found
         "503":
           description: Feedback unavailable
+  /portfolio/case-studies:
+    get:
+      operationId: listPublicCaseStudies
+      tags: [portfolio]
+      summary: List published fictional practice case studies
+      responses:
+        "200":
+          description: Public-safe case studies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicCaseStudy" }
+  /portfolio/case-studies/owner:
+    get:
+      operationId: listOwnerCaseStudies
+      tags: [portfolio]
+      summary: List private case studies for the verified owner
+      responses:
+        "200":
+          description: Owner case studies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/OwnerCaseStudy" }
+        "401": { description: Sign in required }
+        "403": { description: Owner access required }
+    post:
+      operationId: createCaseStudy
+      tags: [portfolio]
+      summary: Create an owner-reviewed case study from a private simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CaseStudyInput" }
+      responses:
+        "201":
+          description: Created case study
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OwnerCaseStudy" }
+        "400": { description: Invalid or insufficiently reviewed case study }
+        "401": { description: Sign in required }
+        "403": { description: Owner access required }
+        "404": { description: Source simulation not found }
+  /portfolio/case-studies/owner/{id}:
+    patch:
+      operationId: updateCaseStudy
+      tags: [portfolio]
+      summary: Replace reviewed case study fields for the verified owner
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CaseStudyUpdate" }
+      responses:
+        "200":
+          description: Updated case study
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OwnerCaseStudy" }
+        "400": { description: Invalid case study }
+        "401": { description: Sign in required }
+        "403": { description: Owner access required }
+        "404": { description: Case study not found }
+    delete:
+      operationId: deleteCaseStudy
+      tags: [portfolio]
+      summary: Delete a case study for the verified owner
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Deleted }
+        "401": { description: Sign in required }
+        "403": { description: Owner access required }
+        "404": { description: Case study not found }
   /healthz:
     get:
       operationId: healthCheck
@@ -268,6 +348,7 @@ paths:
       operationId: createWorkspaceRecord
       tags: [workspace]
       summary: Save a workspace record
+      description: Application packs cannot be created through this generic endpoint; use POST /workspace/packs.
       requestBody:
         required: true
         content:
@@ -346,6 +427,7 @@ paths:
       operationId: updateWorkspaceRecord
       tags: [workspace]
       summary: Update one of the signed-in user's records
+      description: Immutable application pack snapshots cannot be updated.
       parameters:
         - name: id
           in: path
@@ -452,6 +534,94 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /workspace/packs:
+    post:
+      operationId: createApplicationPack
+      tags: [workspace]
+      summary: Create an immutable reviewed application snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ApplicationPackInput" }
+      responses:
+        "201":
+          description: Immutable pack record
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApplicationPackRecord" }
+        "400": { description: Invalid input or review confirmation }
+        "401": { description: Authentication required }
+        "404": { description: Source record not found }
+        "409": { description: Source resume needs fact review }
+  /application-shares:
+    get:
+      operationId: listApplicationShares
+      tags: [workspace]
+      summary: List the signed-in user's share records without secrets or snapshots
+      responses:
+        "200":
+          description: Owned shares
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ApplicationShare" }
+        "401": { description: Authentication required }
+    post:
+      operationId: createApplicationShare
+      tags: [workspace]
+      summary: Create a time-limited, revocable share for an owned pack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ApplicationShareInput" }
+      responses:
+        "201":
+          description: Share and one-time bearer token (never returned again)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreatedApplicationShare" }
+        "400": { description: Invalid input }
+        "401": { description: Authentication required }
+        "404": { description: Pack not found }
+  /application-shares/resolve:
+    post:
+      operationId: resolveApplicationShare
+      tags: [workspace]
+      summary: Resolve a bearer token without placing it in a URL
+      description: Responses are not cached/indexed; request bodies and tokens must never be logged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ShareTokenInput" }
+      responses:
+        "200":
+          description: Public share snapshot
+          headers:
+            Cache-Control: { schema: { type: string, const: no-store } }
+            X-Robots-Tag: { schema: { type: string, const: "noindex, nofollow, noarchive" } }
+            Referrer-Policy: { schema: { type: string, const: no-referrer } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResolvedApplicationShare" }
+        "400": { description: Invalid token format }
+        "404": { description: Invalid or missing share }
+        "410": { description: Revoked or expired share }
+        "429": { description: Resolver rate limit exceeded }
+  /application-shares/{id}:
+    delete:
+      operationId: revokeApplicationShareById
+      tags: [workspace]
+      summary: Revoke an owned share without revealing cross-owner existence
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "204": { description: Revoked }
+        "401": { description: Authentication required }
+        "404": { description: Share not found }
 components:
   schemas:
     PortfolioFeedbackInput:
@@ -604,7 +774,10 @@ components:
         - error
     WorkspaceRecordKind:
       type: string
-      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up, simulation, practice]
+      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up, simulation, practice, research, network, offer, pack]
+    WorkspaceRecordCreateKind:
+      type: string
+      enum: [resume, job, analysis, interview, cover-letter, linkedin, follow-up, simulation, practice, research, network, offer]
     WorkspaceRecord:
       type: object
       properties:
@@ -654,7 +827,7 @@ components:
       type: object
       properties:
         kind:
-          $ref: "#/components/schemas/WorkspaceRecordKind"
+          $ref: "#/components/schemas/WorkspaceRecordCreateKind"
         title:
           type: string
           minLength: 1
@@ -877,6 +1050,223 @@ components:
           items:
             type: string
       required: [questions, questionsToAsk]
+    WorkspaceResearchMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        companyName: { type: string, minLength: 1, maxLength: 200 }
+        role: { type: string, maxLength: 200 }
+        sources:
+          type: array
+          maxItems: 30
+          items: { $ref: "#/components/schemas/ResearchSource" }
+        questions:
+          type: array
+          maxItems: 30
+          items: { type: string, maxLength: 2000 }
+        reasons:
+          type: array
+          maxItems: 30
+          items: { type: string, maxLength: 2000 }
+      required: [companyName, role, sources, questions, reasons]
+    ResearchSource:
+      type: object
+      additionalProperties: false
+      properties:
+        label: { type: string, maxLength: 200 }
+        url: { type: string, maxLength: 2048, pattern: "^$|^https://" }
+        checkedOn: { type: string, maxLength: 10, pattern: "^$|^\\d{4}-\\d{2}-\\d{2}$" }
+      required: [label, url, checkedOn]
+    WorkspaceNetworkMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        organization: { type: string, maxLength: 200 }
+        role: { type: string, maxLength: 200 }
+        email: { type: string, maxLength: 320, pattern: "^$|^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$" }
+        profileUrl: { type: string, maxLength: 2048, pattern: "^$|^https://" }
+        lastContact: { type: string, maxLength: 10, pattern: "^$|^\\d{4}-\\d{2}-\\d{2}$" }
+        nextFollowUp: { type: string, maxLength: 10, pattern: "^$|^\\d{4}-\\d{2}-\\d{2}$" }
+        status: { type: string, enum: [planned, contacted, replied, paused] }
+      required: [name, organization, role, email, profileUrl, lastContact, nextFollowUp, status]
+    WorkspaceOfferMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        company: { type: string, minLength: 1, maxLength: 200 }
+        role: { type: string, maxLength: 200 }
+        currency: { type: string, enum: [INR, USD, EUR, GBP, CAD, AUD] }
+        annualSalary: { type: ["number", "null"], minimum: 0 }
+        annualBonus: { type: ["number", "null"], minimum: 0 }
+        hoursPerWeek: { type: ["number", "null"], exclusiveMinimum: 0 }
+        location: { type: string, maxLength: 200 }
+        arrangement: { type: string, maxLength: 100 }
+        benefits: { type: string, maxLength: 5000 }
+        ratings: { $ref: "#/components/schemas/OfferRatings" }
+      required: [company, role, currency, annualSalary, annualBonus, hoursPerWeek, location, arrangement, benefits, ratings]
+    OfferRatings:
+      type: object
+      additionalProperties: false
+      properties:
+        salary: { type: integer, minimum: 1, maximum: 5 }
+        benefits: { type: integer, minimum: 1, maximum: 5 }
+        location: { type: integer, minimum: 1, maximum: 5 }
+        hours: { type: integer, minimum: 1, maximum: 5 }
+        growth: { type: integer, minimum: 1, maximum: 5 }
+      required: [salary, benefits, location, hours, growth]
+    WorkspacePackMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        reviewed: { type: boolean, const: true }
+        resumeId: { type: integer, minimum: 1 }
+        coverLetterId: { type: ["integer", "null"], minimum: 1 }
+      required: [reviewed, resumeId, coverLetterId]
+    ApplicationPackRecord:
+      allOf:
+        - $ref: "#/components/schemas/WorkspaceRecord"
+        - type: object
+          properties:
+            kind: { type: string, const: pack }
+            metadata: { $ref: "#/components/schemas/WorkspacePackMetadata" }
+          required: [kind, metadata]
+    ApplicationPackInput:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string, minLength: 1, maxLength: 160 }
+        resumeId: { type: integer, minimum: 1 }
+        coverLetterId: { type: ["integer", "null"], minimum: 1 }
+        brief: { type: string, minLength: 1, maxLength: 10000, pattern: ".*\\S.*" }
+        links:
+          type: array
+          maxItems: 30
+          items: { $ref: "#/components/schemas/ApplicationPackLink" }
+        reviewConfirmed: { type: boolean }
+      required: [title, resumeId, coverLetterId, brief, links, reviewConfirmed]
+    ApplicationPackLink:
+      type: object
+      additionalProperties: false
+      properties:
+        label: { type: string, maxLength: 200 }
+        url: { type: string, maxLength: 2048, pattern: "^https://" }
+      required: [label, url]
+    ApplicationPackSnapshot:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string }
+        resume:
+          type: object
+          additionalProperties: false
+          properties: { title: { type: string }, content: { type: string } }
+          required: [title, content]
+        coverLetter:
+          type: ["object", "null"]
+          additionalProperties: false
+          properties: { title: { type: string }, content: { type: string } }
+          required: [title, content]
+        brief: { type: string }
+        links:
+          type: array
+          items: { $ref: "#/components/schemas/ApplicationPackLink" }
+        createdAt: { type: string, format: date-time }
+      required: [title, resume, coverLetter, brief, links, createdAt]
+    ApplicationShareInput:
+      type: object
+      additionalProperties: false
+      properties:
+        packId: { type: integer, minimum: 1 }
+        expiresInDays: { type: integer, enum: [1, 7, 14, 30] }
+        sharingConfirmed: { type: boolean }
+      required: [packId, expiresInDays, sharingConfirmed]
+    ApplicationShare:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        packRecordId: { type: integer, minimum: 1 }
+        title: { type: string }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        revokedAt: { type: ["string", "null"], format: date-time }
+      required: [id, packRecordId, title, createdAt, expiresAt, revokedAt]
+    CreatedApplicationShare:
+      type: object
+      additionalProperties: false
+      properties:
+        share: { $ref: "#/components/schemas/ApplicationShare" }
+        token:
+          type: string
+          pattern: "^[A-Za-z0-9_-]{43}$"
+          description: One-time bearer secret. Store securely; it is not returned by list endpoints.
+      required: [share, token]
+    ShareTokenInput:
+      type: object
+      additionalProperties: false
+      properties:
+        token: { type: string, pattern: "^[A-Za-z0-9_-]{43}$" }
+      required: [token]
+    ResolvedApplicationShare:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string }
+        expiresAt: { type: string, format: date-time }
+        pack: { $ref: "#/components/schemas/ApplicationPackSnapshot" }
+      required: [title, expiresAt, pack]
+    CaseStudyInput:
+      type: object
+      additionalProperties: false
+      properties:
+        simulationId: { type: integer, minimum: 1 }
+        title: { type: string, maxLength: 200 }
+        summary: { type: string, maxLength: 3000 }
+        jobDescription: { type: string, maxLength: 10000 }
+        outreach: { type: string, maxLength: 5000 }
+        reasoning: { type: string, maxLength: 10000 }
+        lessons: { type: string, maxLength: 5000 }
+        fictionalConfirmed: { type: boolean }
+        published: { type: boolean }
+      required: [simulationId, title, summary, jobDescription, outreach, reasoning, lessons, fictionalConfirmed, published]
+    CaseStudyUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        title: { type: string, maxLength: 200 }
+        summary: { type: string, maxLength: 3000 }
+        jobDescription: { type: string, maxLength: 10000 }
+        outreach: { type: string, maxLength: 5000 }
+        reasoning: { type: string, maxLength: 10000 }
+        lessons: { type: string, maxLength: 5000 }
+        fictionalConfirmed: { type: boolean }
+        published: { type: boolean }
+      required: [title, summary, jobDescription, outreach, reasoning, lessons, fictionalConfirmed, published]
+    OwnerCaseStudy:
+      allOf:
+        - $ref: "#/components/schemas/CaseStudyInput"
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+          required: [id, createdAt, updatedAt]
+    PublicCaseStudy:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        summary: { type: string }
+        jobDescription: { type: string }
+        outreach: { type: string }
+        reasoning: { type: string }
+        lessons: { type: string }
+        label: { type: string, const: "Fictional recruiting practice—not professional experience" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [id, title, summary, jobDescription, outreach, reasoning, lessons, label, createdAt, updatedAt]
     WorkspaceKeywordHeatmapEntry:
       type: object
       properties:

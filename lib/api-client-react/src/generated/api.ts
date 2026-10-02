@@ -23,14 +23,25 @@ import type {
   AmbassadorAnswer,
   AmbassadorQuestionInput,
   ApiError,
+  ApplicationPackInput,
+  ApplicationPackRecord,
+  ApplicationShare,
+  ApplicationShareInput,
+  CaseStudyInput,
+  CaseStudyUpdate,
+  CreatedApplicationShare,
   HealthStatus,
   ListWorkspaceRecordsParams,
+  OwnerCaseStudy,
   PortfolioContent,
   PortfolioContentInput,
   PortfolioFeedback,
   PortfolioFeedbackInput,
   PortfolioFeedbackReceipt,
   PortfolioOwnerAccess,
+  PublicCaseStudy,
+  ResolvedApplicationShare,
+  ShareTokenInput,
   WorkspaceDeleteAllInput,
   WorkspaceDeleteAllResult,
   WorkspaceExport,
@@ -626,6 +637,411 @@ export const useDeletePortfolioFeedback = <TError = ErrorType<void>,
       return useMutation(getDeletePortfolioFeedbackMutationOptions(options));
     }
 
+export const getListPublicCaseStudiesUrl = () => {
+
+
+
+
+  return `/api/portfolio/case-studies`
+}
+
+/**
+ * @summary List published fictional practice case studies
+ */
+export const listPublicCaseStudies = async ( options?: Parameters<typeof customFetch>[1]): Promise<PublicCaseStudy[]> => {
+
+  return customFetch<PublicCaseStudy[]>(getListPublicCaseStudiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicCaseStudiesQueryKey = () => {
+    return [
+    `/api/portfolio/case-studies`
+    ] as const;
+    }
+
+
+export const getListPublicCaseStudiesQueryOptions = <TData = Awaited<ReturnType<typeof listPublicCaseStudies>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicCaseStudies>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicCaseStudiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicCaseStudies>>> = ({ signal }) => listPublicCaseStudies({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicCaseStudies>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublicCaseStudiesQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicCaseStudies>>>
+export type ListPublicCaseStudiesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List published fictional practice case studies
+ */
+
+export function useListPublicCaseStudies<TData = Awaited<ReturnType<typeof listPublicCaseStudies>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicCaseStudies>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublicCaseStudiesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListOwnerCaseStudiesUrl = () => {
+
+
+
+
+  return `/api/portfolio/case-studies/owner`
+}
+
+/**
+ * @summary List private case studies for the verified owner
+ */
+export const listOwnerCaseStudies = async ( options?: Parameters<typeof customFetch>[1]): Promise<OwnerCaseStudy[]> => {
+
+  return customFetch<OwnerCaseStudy[]>(getListOwnerCaseStudiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListOwnerCaseStudiesQueryKey = () => {
+    return [
+    `/api/portfolio/case-studies/owner`
+    ] as const;
+    }
+
+
+export const getListOwnerCaseStudiesQueryOptions = <TData = Awaited<ReturnType<typeof listOwnerCaseStudies>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOwnerCaseStudies>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListOwnerCaseStudiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOwnerCaseStudies>>> = ({ signal }) => listOwnerCaseStudies({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listOwnerCaseStudies>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListOwnerCaseStudiesQueryResult = NonNullable<Awaited<ReturnType<typeof listOwnerCaseStudies>>>
+export type ListOwnerCaseStudiesQueryError = ErrorType<void>
+
+
+/**
+ * @summary List private case studies for the verified owner
+ */
+
+export function useListOwnerCaseStudies<TData = Awaited<ReturnType<typeof listOwnerCaseStudies>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOwnerCaseStudies>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListOwnerCaseStudiesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateCaseStudyUrl = () => {
+
+
+
+
+  return `/api/portfolio/case-studies/owner`
+}
+
+/**
+ * @summary Create an owner-reviewed case study from a private simulation
+ */
+export const createCaseStudy = async (caseStudyInput: CaseStudyInput, options?: Parameters<typeof customFetch>[1]): Promise<OwnerCaseStudy> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<OwnerCaseStudy>(getCreateCaseStudyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(caseStudyInput)
+  }
+);}
+
+
+
+
+
+export const getCreateCaseStudyMutationKey = () => ['createCaseStudy'] as const;
+
+export const getCreateCaseStudyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCaseStudy>>, TError,CreateCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCaseStudy>>, TError,CreateCaseStudyMutationVariables, TContext> => {
+
+const mutationKey = getCreateCaseStudyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCaseStudy>>, CreateCaseStudyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createCaseStudy(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCaseStudyMutationResult = NonNullable<Awaited<ReturnType<typeof createCaseStudy>>>
+    export type CreateCaseStudyMutationBody = BodyType<CaseStudyInput>
+    export type CreateCaseStudyMutationError = ErrorType<void>
+    export type CreateCaseStudyMutationVariables = {data: BodyType<CaseStudyInput>}
+
+    /**
+ * @summary Create an owner-reviewed case study from a private simulation
+ */
+export const useCreateCaseStudy = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCaseStudy>>, TError,CreateCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createCaseStudy>>,
+        TError,
+        CreateCaseStudyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateCaseStudyMutationOptions(options));
+    }
+
+export const getUpdateCaseStudyUrl = (id: string,) => {
+
+
+
+
+  return `/api/portfolio/case-studies/owner/${id}`
+}
+
+/**
+ * @summary Replace reviewed case study fields for the verified owner
+ */
+export const updateCaseStudy = async (id: string,
+    caseStudyUpdate: CaseStudyUpdate, options?: Parameters<typeof customFetch>[1]): Promise<OwnerCaseStudy> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<OwnerCaseStudy>(getUpdateCaseStudyUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(caseStudyUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateCaseStudyMutationKey = () => ['updateCaseStudy'] as const;
+
+export const getUpdateCaseStudyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCaseStudy>>, TError,UpdateCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCaseStudy>>, TError,UpdateCaseStudyMutationVariables, TContext> => {
+
+const mutationKey = getUpdateCaseStudyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCaseStudy>>, UpdateCaseStudyMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateCaseStudy(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCaseStudyMutationResult = NonNullable<Awaited<ReturnType<typeof updateCaseStudy>>>
+    export type UpdateCaseStudyMutationBody = BodyType<CaseStudyUpdate>
+    export type UpdateCaseStudyMutationError = ErrorType<void>
+    export type UpdateCaseStudyMutationVariables = {id: string;data: BodyType<CaseStudyUpdate>}
+
+    /**
+ * @summary Replace reviewed case study fields for the verified owner
+ */
+export const useUpdateCaseStudy = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCaseStudy>>, TError,UpdateCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateCaseStudy>>,
+        TError,
+        UpdateCaseStudyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateCaseStudyMutationOptions(options));
+    }
+
+export const getDeleteCaseStudyUrl = (id: string,) => {
+
+
+
+
+  return `/api/portfolio/case-studies/owner/${id}`
+}
+
+/**
+ * @summary Delete a case study for the verified owner
+ */
+export const deleteCaseStudy = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteCaseStudyUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteCaseStudyMutationKey = () => ['deleteCaseStudy'] as const;
+
+export const getDeleteCaseStudyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCaseStudy>>, TError,DeleteCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteCaseStudy>>, TError,DeleteCaseStudyMutationVariables, TContext> => {
+
+const mutationKey = getDeleteCaseStudyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteCaseStudy>>, DeleteCaseStudyMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteCaseStudy(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteCaseStudyMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCaseStudy>>>
+
+    export type DeleteCaseStudyMutationError = ErrorType<void>
+    export type DeleteCaseStudyMutationVariables = {id: string}
+
+    /**
+ * @summary Delete a case study for the verified owner
+ */
+export const useDeleteCaseStudy = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCaseStudy>>, TError,DeleteCaseStudyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteCaseStudy>>,
+        TError,
+        DeleteCaseStudyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteCaseStudyMutationOptions(options));
+    }
+
 export const getHealthCheckUrl = () => {
 
 
@@ -886,6 +1302,7 @@ export const getCreateWorkspaceRecordUrl = () => {
 }
 
 /**
+ * Application packs cannot be created through this generic endpoint; use POST /workspace/packs.
  * @summary Save a workspace record
  */
 export const createWorkspaceRecord = async (workspaceRecordInput: WorkspaceRecordInput, options?: Parameters<typeof customFetch>[1]): Promise<WorkspaceRecord> => {
@@ -1139,6 +1556,7 @@ export const getUpdateWorkspaceRecordUrl = (id: number,) => {
 }
 
 /**
+ * Immutable application pack snapshots cannot be updated.
  * @summary Update one of the signed-in user's records
  */
 export const updateWorkspaceRecord = async (id: number,
@@ -1379,5 +1797,421 @@ export const useGenerateWorkspaceContent = <TError = ErrorType<ApiError>,
         TContext
       > => {
       return useMutation(getGenerateWorkspaceContentMutationOptions(options));
+    }
+
+export const getCreateApplicationPackUrl = () => {
+
+
+
+
+  return `/api/workspace/packs`
+}
+
+/**
+ * @summary Create an immutable reviewed application snapshot
+ */
+export const createApplicationPack = async (applicationPackInput: ApplicationPackInput, options?: Parameters<typeof customFetch>[1]): Promise<ApplicationPackRecord> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ApplicationPackRecord>(getCreateApplicationPackUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(applicationPackInput)
+  }
+);}
+
+
+
+
+
+export const getCreateApplicationPackMutationKey = () => ['createApplicationPack'] as const;
+
+export const getCreateApplicationPackMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplicationPack>>, TError,CreateApplicationPackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createApplicationPack>>, TError,CreateApplicationPackMutationVariables, TContext> => {
+
+const mutationKey = getCreateApplicationPackMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createApplicationPack>>, CreateApplicationPackMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createApplicationPack(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateApplicationPackMutationResult = NonNullable<Awaited<ReturnType<typeof createApplicationPack>>>
+    export type CreateApplicationPackMutationBody = BodyType<ApplicationPackInput>
+    export type CreateApplicationPackMutationError = ErrorType<void>
+    export type CreateApplicationPackMutationVariables = {data: BodyType<ApplicationPackInput>}
+
+    /**
+ * @summary Create an immutable reviewed application snapshot
+ */
+export const useCreateApplicationPack = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplicationPack>>, TError,CreateApplicationPackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createApplicationPack>>,
+        TError,
+        CreateApplicationPackMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateApplicationPackMutationOptions(options));
+    }
+
+export const getListApplicationSharesUrl = () => {
+
+
+
+
+  return `/api/application-shares`
+}
+
+/**
+ * @summary List the signed-in user's share records without secrets or snapshots
+ */
+export const listApplicationShares = async ( options?: Parameters<typeof customFetch>[1]): Promise<ApplicationShare[]> => {
+
+  return customFetch<ApplicationShare[]>(getListApplicationSharesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListApplicationSharesQueryKey = () => {
+    return [
+    `/api/application-shares`
+    ] as const;
+    }
+
+
+export const getListApplicationSharesQueryOptions = <TData = Awaited<ReturnType<typeof listApplicationShares>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listApplicationShares>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListApplicationSharesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApplicationShares>>> = ({ signal }) => listApplicationShares({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApplicationShares>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListApplicationSharesQueryResult = NonNullable<Awaited<ReturnType<typeof listApplicationShares>>>
+export type ListApplicationSharesQueryError = ErrorType<void>
+
+
+/**
+ * @summary List the signed-in user's share records without secrets or snapshots
+ */
+
+export function useListApplicationShares<TData = Awaited<ReturnType<typeof listApplicationShares>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listApplicationShares>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListApplicationSharesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateApplicationShareUrl = () => {
+
+
+
+
+  return `/api/application-shares`
+}
+
+/**
+ * @summary Create a time-limited, revocable share for an owned pack
+ */
+export const createApplicationShare = async (applicationShareInput: ApplicationShareInput, options?: Parameters<typeof customFetch>[1]): Promise<CreatedApplicationShare> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CreatedApplicationShare>(getCreateApplicationShareUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(applicationShareInput)
+  }
+);}
+
+
+
+
+
+export const getCreateApplicationShareMutationKey = () => ['createApplicationShare'] as const;
+
+export const getCreateApplicationShareMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplicationShare>>, TError,CreateApplicationShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createApplicationShare>>, TError,CreateApplicationShareMutationVariables, TContext> => {
+
+const mutationKey = getCreateApplicationShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createApplicationShare>>, CreateApplicationShareMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createApplicationShare(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateApplicationShareMutationResult = NonNullable<Awaited<ReturnType<typeof createApplicationShare>>>
+    export type CreateApplicationShareMutationBody = BodyType<ApplicationShareInput>
+    export type CreateApplicationShareMutationError = ErrorType<void>
+    export type CreateApplicationShareMutationVariables = {data: BodyType<ApplicationShareInput>}
+
+    /**
+ * @summary Create a time-limited, revocable share for an owned pack
+ */
+export const useCreateApplicationShare = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createApplicationShare>>, TError,CreateApplicationShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createApplicationShare>>,
+        TError,
+        CreateApplicationShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateApplicationShareMutationOptions(options));
+    }
+
+export const getResolveApplicationShareUrl = () => {
+
+
+
+
+  return `/api/application-shares/resolve`
+}
+
+/**
+ * Responses are not cached/indexed; request bodies and tokens must never be logged.
+ * @summary Resolve a bearer token without placing it in a URL
+ */
+export const resolveApplicationShare = async (shareTokenInput: ShareTokenInput, options?: Parameters<typeof customFetch>[1]): Promise<ResolvedApplicationShare> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ResolvedApplicationShare>(getResolveApplicationShareUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(shareTokenInput)
+  }
+);}
+
+
+
+
+
+export const getResolveApplicationShareMutationKey = () => ['resolveApplicationShare'] as const;
+
+export const getResolveApplicationShareMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveApplicationShare>>, TError,ResolveApplicationShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveApplicationShare>>, TError,ResolveApplicationShareMutationVariables, TContext> => {
+
+const mutationKey = getResolveApplicationShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveApplicationShare>>, ResolveApplicationShareMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  resolveApplicationShare(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveApplicationShareMutationResult = NonNullable<Awaited<ReturnType<typeof resolveApplicationShare>>>
+    export type ResolveApplicationShareMutationBody = BodyType<ShareTokenInput>
+    export type ResolveApplicationShareMutationError = ErrorType<void>
+    export type ResolveApplicationShareMutationVariables = {data: BodyType<ShareTokenInput>}
+
+    /**
+ * @summary Resolve a bearer token without placing it in a URL
+ */
+export const useResolveApplicationShare = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveApplicationShare>>, TError,ResolveApplicationShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resolveApplicationShare>>,
+        TError,
+        ResolveApplicationShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResolveApplicationShareMutationOptions(options));
+    }
+
+export const getRevokeApplicationShareByIdUrl = (id: string,) => {
+
+
+
+
+  return `/api/application-shares/${id}`
+}
+
+/**
+ * @summary Revoke an owned share without revealing cross-owner existence
+ */
+export const revokeApplicationShareById = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRevokeApplicationShareByIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevokeApplicationShareByIdMutationKey = () => ['revokeApplicationShareById'] as const;
+
+export const getRevokeApplicationShareByIdMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeApplicationShareById>>, TError,RevokeApplicationShareByIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revokeApplicationShareById>>, TError,RevokeApplicationShareByIdMutationVariables, TContext> => {
+
+const mutationKey = getRevokeApplicationShareByIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeApplicationShareById>>, RevokeApplicationShareByIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  revokeApplicationShareById(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeApplicationShareByIdMutationResult = NonNullable<Awaited<ReturnType<typeof revokeApplicationShareById>>>
+
+    export type RevokeApplicationShareByIdMutationError = ErrorType<void>
+    export type RevokeApplicationShareByIdMutationVariables = {id: string}
+
+    /**
+ * @summary Revoke an owned share without revealing cross-owner existence
+ */
+export const useRevokeApplicationShareById = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeApplicationShareById>>, TError,RevokeApplicationShareByIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof revokeApplicationShareById>>,
+        TError,
+        RevokeApplicationShareByIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRevokeApplicationShareByIdMutationOptions(options));
     }
 

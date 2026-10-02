@@ -5,11 +5,11 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceRecordKind } from './workspaceRecordKind';
+import type { WorkspaceRecordCreateKind } from './workspaceRecordCreateKind';
 import type { WorkspaceRecordMetadata } from './workspaceRecordMetadata';
 
 export interface WorkspaceRecordInput {
-  kind: WorkspaceRecordKind;
+  kind: WorkspaceRecordCreateKind;
   /**
      * @minLength 1
      * @maxLength 160
