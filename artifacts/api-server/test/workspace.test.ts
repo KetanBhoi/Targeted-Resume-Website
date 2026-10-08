@@ -690,6 +690,8 @@ describe('workspace API authentication and ownership', () => {
     expect(analysis.metadata.batchId).toBe('comparison-batch-a');
     expect(JSON.parse(mockGenerationState.userPrompt).jobDescription).toBe(jobDescription);
     expect(JSON.parse(mockGenerationState.userPrompt).trackedApplication).toBeUndefined();
+    expect(mockGenerationState.systemPrompt).toContain('IT recruitment and AI-assisted web development');
+    expect(mockGenerationState.systemPrompt).toContain('do not force every applicant into both tracks');
     expect(analysis.metadata.skillGaps).toEqual(['Tableau']);
     expect(analysis.metadata.roadmap).toEqual([{
       skill: 'Tableau',

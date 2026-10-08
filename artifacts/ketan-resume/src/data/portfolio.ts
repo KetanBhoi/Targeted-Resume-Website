@@ -1,10 +1,10 @@
 export const portfolio = {
   name: "Ketan Kaushikbhai Bhoi",
-  targetRole: "Recruiter / Talent Acquisition",
+  targetRole: "IT Recruiter & AI-Assisted Web Developer | Prompt Engineering",
   positioning:
-    "An early-career recruiter candidate bringing structured evaluation, detail-minded operations, and technology fluency.",
+    "An early-career candidate with two target roles, IT recruiter and AI-assisted web developer, bringing structured evaluation, detail-minded operations, and hands-on web development.",
   context:
-    "The resume documents IT education and software-development experience, not prior recruiting work. The strengths below are transferable evidence, not claims of recruiting experience.",
+    "These are career focus areas and target roles, not past employment. The resume documents IT education and software-development experience; it documents no direct recruiting or AI employment. The strengths below are transferable evidence.",
   strengths: [
     {
       title: "Structured evaluation",
@@ -25,6 +25,13 @@ export const portfolio = {
       detail:
         "B.Tech in Information Technology; built vendor- and customer-facing modules for a multivendor commerce product and integrated REST APIs.",
       proof: "Education and MERN Stack Web Developer, Haronex Technology · Jan–April 2026",
+      section: "projects",
+    },
+    {
+      title: "AI-assisted web development",
+      detail:
+        "Lists Prompt Engineering and LLM quality review as skills. This portfolio is a current work sample built through prompts in Replit; its capabilities are observable on the site.",
+      proof: "Current portfolio work sample",
       section: "projects",
     },
   ],
@@ -65,8 +72,26 @@ export const portfolio = {
       link: null,
       section: "experience",
     },
+    {
+      name: "This portfolio (current work sample)",
+      kind: "AI-assisted web development work sample",
+      context: "Current project, built through prompts in Replit. Not part of the Haronex Technology or Jinarth Infotech roles.",
+      problem:
+        "Presents two career focus areas, IT recruiter and AI-assisted web developer, with documented evidence for each.",
+      contribution:
+        "Directed the build through prompts. Implemented capabilities include a public page in English, Hindi, and Gujarati, role views, a one-page brief PDF, a resume Q&A, and a signed-in private workspace.",
+      outcome:
+        "Observable as the working site you are viewing. No launch date, customer counts, or published results are documented, and no source-code or live project link is supplied.",
+      tools: ["Replit", "Prompt engineering", "React.js"],
+      link: null,
+      section: "projects",
+    },
   ],
   skills: [
+    {
+      group: "AI-assisted web development",
+      items: ["Prompt engineering", "Prompt-driven building in Replit", "LLM output review and quality assessment"],
+    },
     {
       group: "AI / LLM evaluation",
       items: [

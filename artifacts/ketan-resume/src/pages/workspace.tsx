@@ -80,7 +80,7 @@ const viewCopy: Record<WorkspaceView, { eyebrow: string; title: string; descript
   lab: { eyebrow: 'Recruiting lab', title: 'Learn by practicing.', description: 'Fictional recruiting exercises, never claims of professional experience.' },
   practice: { eyebrow: 'Practice history', title: 'Reflect on your preparation.', description: 'Your privately saved written answers and reflections.' },
   portfolio: { eyebrow: 'Portfolio settings', title: 'Choose what employers see.', description: 'Owner-only publishing controls for availability, booking, credentials, and recommendations.' },
-  insights: { eyebrow: 'Owner insights', title: 'See what recruiters noticed.', description: 'Private feedback and portfolio analytics.' },
+  insights: { eyebrow: 'Owner insights', title: 'See what reviewers noticed.', description: 'Private feedback and portfolio analytics.' },
   overview: {
     eyebrow: 'Private career workbench',
     title: 'Keep the signal close.',
@@ -471,7 +471,7 @@ function RecordModal({ kind, record, onClose, onSaved }: { kind: 'resume' | 'job
           <button type="button" className="workspace-icon-button" onClick={onClose} data-testid="button-close-record-modal" aria-label="Close dialog"><X size={18} /></button>
         </div>
         <form onSubmit={submit} className="workspace-form">
-          <label><span>Title</span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder={kind === 'resume' ? 'Recruiting resume · April 2025' : 'Role title · company'} data-testid="input-record-title" /></label>
+          <label><span>Title</span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder={kind === 'resume' ? 'Resume · April 2025' : 'Role title · company'} data-testid="input-record-title" /></label>
           {kind === 'job' && <div className="workspace-form-grid">
             <label><span>Company</span><input value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Company name" data-testid="input-job-company" /></label>
             <label><span>Status</span><select value={status} onChange={(event) => setStatus(event.target.value)} data-testid="select-job-status"><option>Saved</option><option>Applied</option><option>Interviewing</option><option>Offer</option><option>Closed</option></select></label>
@@ -1138,7 +1138,7 @@ function MatchPage() {
           <div className="workspace-panel-head"><div><span className="workspace-eyebrow"><span className="workspace-eyebrow-line" />New analysis</span><h2>Bring the role in.</h2></div><BarChart3 size={19} /></div>
           {resumes.length === 0 ? <EmptyState title={allResumes.length ? 'Review the tailored draft first.' : 'Save a resume first.'} body={allResumes.length ? 'AI-tailored drafts are unavailable for role matching until you check the complete diff and verify their facts.' : 'The match lens needs a real version of your resume as its source.'} action={<Link href="/workspace" className="workspace-text-button" data-testid="link-match-add-resume">{allResumes.length ? 'Review versions' : 'Go to resume library'} <ArrowRight size={13} /></Link>} /> : <>
             <label><span>Resume version</span><select value={selectedResume?.id ?? 0} onChange={(event) => setResumeId(Number(event.target.value))} data-testid="select-match-resume">{resumes.map((resume) => <option key={resume.id} value={resume.id}>{resume.title}</option>)}</select></label>
-            <label><span>Role or company label <em>Optional</em></span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Talent acquisition associate" data-testid="input-match-title" /></label>
+            <label><span>Role or company label <em>Optional</em></span><input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="IT recruiter or AI web developer role" data-testid="input-match-title" /></label>
             <label><span>Job description</span><textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={13} placeholder="Paste the job description here. The analysis stays attached to your account." data-testid="textarea-job-description" /></label>
             {description.trim() && selectedResume && <KeywordHeatmap items={buildKeywordPreview(description, selectedResume.content)} />}
             <div className="workspace-form-footer"><span>{selectedResume?.content.length.toLocaleString() ?? 0} resume characters selected</span><button type="submit" className="workspace-button workspace-button-dark" disabled={!description.trim() || generateContent.isPending} data-testid="button-run-match">{generateContent.isPending ? 'Reading role…' : 'Run match'} <ArrowRight size={15} /></button></div>

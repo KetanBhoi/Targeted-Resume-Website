@@ -112,7 +112,7 @@ const navItems: { label: string; href: string }[] = [
 ];
 
 const starterQuestions = [
-  { label: 'Role fit', question: 'Why is Ketan a fit for recruiting or talent acquisition?' },
+  { label: 'Role fit', question: 'Why is Ketan a fit for IT recruiting or AI-assisted web development?' },
   { label: 'Project proof', question: 'What did Ketan contribute to the MetroMart project?' },
   { label: 'Measurable impact', question: 'What measurable impact or metrics does the resume provide?' },
   { label: 'Leadership', question: 'What evidence of leadership is listed?' },
@@ -194,11 +194,11 @@ function Hero({ onDownload }: { onDownload: () => void }) {
         <div className="reveal">
           <div className="mb-8 inline-flex items-center gap-2 border border-border bg-card/70 px-3 py-2 font-mono-custom text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
             <span className="size-2 rounded-full bg-accent ring-2 ring-accent/30" />
-            {t('Visual resume · recruiter-facing')}
+            {t('Visual resume · two career paths')}
           </div>
           <h1 className="max-w-4xl font-display text-[clamp(3.3rem,8.4vw,8.1rem)] leading-[.84] tracking-[-0.055em] text-primary">
-            {t('A careful eye')}<br />
-            <span className="text-muted-foreground">{t('for people')}</span>
+            {t('People, prompts')}<br />
+            <span className="text-muted-foreground">{t('and proof')}</span>
             <span className="text-accent">.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-8 text-muted-foreground lg:text-xl">
@@ -252,7 +252,7 @@ function RoleFit() {
             {t('Proof before')}<br /><span className="text-muted-foreground">{t('promises.')}</span>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-            {t('The resume does not list direct recruiting experience. It does show patterns that can transfer into recruiting work.')}
+            {t('The resume does not list direct recruiting or AI employment. It does show patterns that can transfer into both target roles.')}
           </p>
         </div>
         <div className="grid gap-3">
@@ -285,7 +285,7 @@ function Experience() {
           <div>
             <h2 className="font-display text-5xl leading-[.93] tracking-[-0.04em] sm:text-6xl">{t('Work that shows how he thinks.')}</h2>
             <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-              {t('Software development is the documented experience. The useful signal for a recruiter is how Ketan approached structure, ownership, and follow-through.')}
+              {t('Software development is the documented experience. The useful signal for both target roles is how Ketan approached structure, ownership, and follow-through.')}
             </p>
           </div>
           <div className="space-y-10">
@@ -327,6 +327,27 @@ function Experience() {
               <div className="mt-6 flex flex-wrap gap-2">
                 {portfolio.projects[0].tools.map((tool) => (
                   <span key={tool} className="border border-primary-foreground/20 px-2.5 py-1.5 font-mono-custom text-[10px] text-primary-foreground/75" data-testid={`tag-tool-${tool.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{tool}</span>
+                ))}
+              </div>
+            </article>
+            <article className="border border-primary bg-card p-6 sm:p-8" data-testid="card-project-portfolio">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{t('Current work sample')}</p>
+                  <h3 className="mt-2 font-display text-4xl">{portfolio.projects[1].name}</h3>
+                </div>
+                <span className="border border-border px-2 py-1 font-mono-custom text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{portfolio.projects[1].kind}</span>
+              </div>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">{portfolio.projects[1].context}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6">{portfolio.projects[1].problem}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">{portfolio.projects[1].contribution}</p>
+              <div className="mt-5 border-t border-border pt-4">
+                <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{t('Outcome, stated plainly')}</p>
+                <p className="mt-2 text-sm leading-6">{portfolio.projects[1].outcome}</p>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {portfolio.projects[1].tools.map((tool) => (
+                  <span key={tool} className="border border-border px-2.5 py-1.5 font-mono-custom text-[10px] text-muted-foreground">{tool}</span>
                 ))}
               </div>
             </article>
@@ -510,7 +531,7 @@ function Ambassador() {
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 maxLength={600}
-                placeholder={t('Ask a recruiter-minded question…')}
+                placeholder={t('Ask about either career path…')}
                 className="min-w-0 flex-1 border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                 data-testid="input-ambassador-question"
               />
@@ -567,7 +588,7 @@ function downloadResume() {
   const resumeRows = [
     { text: portfolio.positioning, size: 10, leading: 15 },
     { text: '', size: 10, leading: 6 },
-    { text: 'ROLE CONTEXT', size: 11, leading: 19 },
+    { text: 'CAREER FOCUS AND CONTEXT', size: 11, leading: 19 },
     { text: portfolio.context, size: 9, leading: 14 },
     { text: '', size: 10, leading: 6 },
     { text: 'TRANSFERABLE STRENGTHS', size: 11, leading: 19 },
@@ -588,6 +609,13 @@ function downloadResume() {
     { text: portfolio.projects[0].contribution, size: 9, leading: 14 },
     { text: portfolio.projects[0].outcome, size: 9, leading: 14 },
     { text: `Tools: ${portfolio.projects[0].tools.join(', ')}`, size: 8, leading: 12 },
+    { text: '', size: 10, leading: 6 },
+    { text: 'CURRENT WORK SAMPLE (NOT EMPLOYMENT)', size: 11, leading: 19 },
+    { text: `${portfolio.projects[1].name} - ${portfolio.projects[1].kind}`, size: 10, leading: 15 },
+    { text: portfolio.projects[1].context, size: 9, leading: 14 },
+    { text: portfolio.projects[1].contribution, size: 9, leading: 14 },
+    { text: portfolio.projects[1].outcome, size: 9, leading: 14 },
+    { text: `Tools: ${portfolio.projects[1].tools.join(', ')}`, size: 8, leading: 12 },
     { text: '', size: 10, leading: 6 },
     { text: 'SKILLS', size: 11, leading: 19 },
     ...portfolio.skills.map((group) => ({
