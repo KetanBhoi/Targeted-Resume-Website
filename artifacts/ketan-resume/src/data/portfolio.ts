@@ -30,8 +30,8 @@ export const portfolio = {
     {
       title: "AI-assisted web development",
       detail:
-        "Lists Prompt Engineering and LLM quality review as skills. This portfolio is a current work sample built through prompts in Replit; its capabilities are observable on the site.",
-      proof: "Current portfolio work sample",
+        "Lists Prompt Engineering and LLM quality review as skills. The owner supplied 11 unique Handshake AI projects and states that they were created entirely through prompts, including web apps, prototypes, design work and presentations.",
+      proof: "Handshake AI project profile (owner-reported)",
       section: "projects",
     },
   ],
@@ -79,11 +79,11 @@ export const portfolio = {
       problem:
         "Presents two career focus areas, IT recruiter and AI-assisted web developer, with documented evidence for each.",
       contribution:
-        "Directed the build through prompts. Implemented capabilities include a public page in English, Hindi, and Gujarati, role views, a one-page brief PDF, a resume Q&A, and a signed-in private workspace.",
+        "Created this portfolio entirely through prompts in Replit. Its capabilities include a public page in English, Hindi, and Gujarati, role views, a one-page brief PDF, a resume Q&A, and a signed-in private workspace.",
       outcome:
-        "Observable as the working site you are viewing. No launch date, customer counts, or published results are documented, and no source-code or live project link is supplied.",
+        "Observable as the site you are viewing. Additional owner-supplied project links are listed below. No launch date, customer counts or published results are documented; no source-code repository is supplied.",
       tools: ["Replit", "Prompt engineering", "React.js"],
-      link: null,
+      link: "https://targeted-resume-website.replit.app/",
       section: "projects",
     },
   ],
