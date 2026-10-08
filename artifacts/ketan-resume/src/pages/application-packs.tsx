@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@clerk/react';
-import { Copy, Download, Link2, Plus, Trash2 } from 'lucide-react';
+import { Copy, Link2, Plus, Trash2 } from 'lucide-react';
 import {
   getListApplicationSharesQueryKey,
   useCreateApplicationPack,
@@ -14,7 +14,8 @@ import {
   type ApplicationShare,
   type WorkspaceRecord,
 } from '@workspace/api-client-react';
-import { downloadApplicationPack, parseApplicationPack } from '@/lib/application-pack';
+import { parseApplicationPack } from '@/lib/application-pack';
+import ApplicationPackDownloads from '@/components/application-pack-downloads';
 import '@/styles/application-sharing.css';
 
 const RECORDS_KEY = ['/api/workspace/records'] as const;
@@ -137,7 +138,7 @@ export default function ApplicationPacksPage() {
       <header className="workspace-page-header"><div>
         <div className="workspace-eyebrow"><span className="workspace-eyebrow-line" />Application packs</div>
         <h1>Send one reviewed bundle.</h1>
-        <p>A pack is a frozen snapshot of a resume, optional cover letter, brief and links. Later edits to the originals do not change it. Downloads are ZIP files of plain text, not PDFs.</p>
+        <p>A pack is a frozen snapshot of a resume, optional cover letter, brief and links. Later edits to the originals do not change it. Download a formatted PDF or a ZIP of original text files. PDFs support English, Hindi and Gujarati text without translating your documents.</p>
       </div></header>
       <div className="as-grid">
         <section className="workspace-panel" aria-labelledby="pack-create-h">
@@ -202,7 +203,7 @@ export default function ApplicationPacksPage() {
                 <h3>{p.title}</h3>
                 <p className="as-note">Snapshot {new Date(p.createdAt).toLocaleString()}{snap ? ` · resume "${snap.resume.title}"${snap.coverLetter ? ` · cover letter "${snap.coverLetter.title}"` : ''} · ${snap.links.length} link(s)` : ' · snapshot unreadable'}</p>
                 <div className="as-row">
-                  <button type="button" className="workspace-button workspace-button-quiet" disabled={!snap} onClick={() => { setDlErr(''); if (snap) downloadApplicationPack(snap).catch(() => setDlErr('Download failed. Try again.')); }} data-testid={`button-download-pack-${p.id}`}><Download size={14} aria-hidden="true" />Download ZIP (text)</button>
+                  <ApplicationPackDownloads pack={snap} zipTestId={`button-download-pack-${p.id}`} pdfTestId={`button-download-pdf-pack-${p.id}`} />
                   {confirmDel === p.id ? (
                     <span className="as-row"><span className="as-note">Delete pack and revoke its share links?</span>
                       <button type="button" className="workspace-delete-button" disabled={delPack.isPending} data-testid={`button-confirm-delete-pack-${p.id}`} onClick={() => delPack.mutate({ id: p.id }, { onSuccess: () => { setConfirmDel(null); refreshAll(); }, onError: () => setDlErr('Delete failed. Try again.') })}>Confirm delete</button>

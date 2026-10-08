@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Download, TriangleAlert } from 'lucide-react';
+import { TriangleAlert } from 'lucide-react';
 import { useResolveApplicationShare, type ResolvedApplicationShare } from '@workspace/api-client-react';
-import { downloadApplicationPack } from '@/lib/application-pack';
+import ApplicationPackDownloads from '@/components/application-pack-downloads';
 import '@/styles/application-sharing.css';
 
 const TOKEN_RE = /^[A-Za-z0-9_-]{43}$/;
@@ -27,7 +27,6 @@ export default function SharedApplication() {
   const [token, setToken] = useState(readToken);
   const [data, setData] = useState<ResolvedApplicationShare | null>(null);
   const [failure, setFailure] = useState<'invalid' | 'unavailable' | 'network' | null>(null);
-  const [dlError, setDlError] = useState(false);
   const latestRequest = useRef(0);
   const currentToken = useRef(token);
   const resolve = useResolveApplicationShare();
@@ -93,8 +92,7 @@ export default function SharedApplication() {
               <p className="as-note">Access expires {new Date(data.expiresAt).toLocaleString()}. Shared by link; no account needed.</p>
             </header>
             <div className="as-row">
-              <button type="button" className="workspace-button workspace-button-dark" data-testid="button-download-shared" onClick={() => { setDlError(false); downloadApplicationPack(pack).catch(() => setDlError(true)); }}><Download size={14} aria-hidden="true" />Download ZIP (text files)</button>
-              {dlError && <p className="as-err" role="alert">Download failed. Try again.</p>}
+              <ApplicationPackDownloads pack={pack} zipTestId="button-download-shared" pdfTestId="button-download-pdf-shared" />
             </div>
             <div className="as-preview">
               <h3>Resume — {pack.resume.title}</h3><pre data-testid="text-share-resume">{pack.resume.content}</pre>

@@ -2,3 +2,4 @@
 - [AI resume verification](ai-resume-verification.md) — generated resume revisions need owner fact review before they can be reused as application-ready evidence.
 - [Portfolio privacy](portfolio-privacy.md) — open sign-up is not owner access; feedback stays private, interview recordings stay on-device, and analytics excludes private content.
 - [Preview JSX instrumentation](preview-jsx-instrumentation.md) — preview metadata injection can break explicit generic JSX even when TypeScript and production builds pass.
+- [Multilingual application PDFs](application-pack-pdfs.md) — use local shaping fonts and reviewed snapshots; visual Indic rendering does not guarantee exact text extraction.
