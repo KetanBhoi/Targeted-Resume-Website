@@ -366,6 +366,55 @@ export function translate(language: PortfolioLanguage, english: string): string 
 export type LocalizedPortfolio = typeof portfolio;
 
 /** Typed localized copy of the portfolio. Names, companies, dates, credentials, URLs and tool names are untouched. */
+// Current owner-reported work history and its public-facing summaries.
+translationEntries.push(
+  [
+    "An early-career professional with current freelance design and AI evaluation experience, a background in software development, and goals in IT recruitment and AI-assisted web development through prompt engineering.",
+    "करियर के शुरुआती चरण के पेशेवर, जिनके पास स्वतंत्र डिज़ाइन और AI मूल्यांकन का मौजूदा अनुभव, सॉफ़्टवेयर डेवलपमेंट की पृष्ठभूमि और प्रॉम्प्ट इंजीनियरिंग के ज़रिए IT भर्ती तथा AI-सहायता प्राप्त वेब डेवलपमेंट के लक्ष्य हैं।",
+    "કરિયરના શરૂઆતના તબક્કાના વ્યાવસાયિક, જેમને ફ્રીલાન્સ ડિઝાઇન અને AI મૂલ્યાંકનનો વર્તમાન અનુભવ, સોફ્ટવેર ડેવલપમેન્ટની પૃષ્ઠભૂમિ અને પ્રોમ્પ્ટ એન્જિનિયરિંગ દ્વારા IT ભરતી તથા AI-સહાયિત વેબ ડેવલપમેન્ટના લક્ષ્યો છે.",
+  ],
+  [
+    "Freelance Designer & AI Evaluation Specialist at Handshake AI since May 2026, alongside earlier web-development roles. IT recruitment and AI-assisted web development are target career paths, not prior job titles. Direct IT-recruiting employment and paid AI-assisted web-development employment are not documented.",
+    "May 2026 से Handshake AI में फ्रीलांस डिज़ाइनर एवं AI मूल्यांकन विशेषज्ञ की भूमिका, और इससे पहले वेब डेवलपमेंट की भूमिकाएँ। IT भर्ती और AI-सहायता प्राप्त वेब डेवलपमेंट लक्षित करियर हैं, पिछली नौकरी के पद नहीं। सीधे IT-रिक्रूटिंग रोज़गार और सवेतन AI-सहायता प्राप्त वेब-डेवलपमेंट रोज़गार का दस्तावेज़ी प्रमाण नहीं है।",
+    "May 2026 થી Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાતની ભૂમિકા, અને તે પહેલાં વેબ ડેવલપમેન્ટની ભૂમિકાઓ. IT ભરતી અને AI-સહાયિત વેબ ડેવલપમેન્ટ લક્ષ્ય કરિયર છે, અગાઉનાં નોકરીનાં પદો નહીં. સીધા IT ભરતીના રોજગાર અને પગારવાળા AI-સહાયિત વેબ ડેવલપમેન્ટના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
+  ],
+  [
+    "Freelance Designer & AI Evaluation Specialist",
+    "फ्रीलांस डिज़ाइनर एवं AI मूल्यांकन विशेषज्ञ",
+    "ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત",
+  ],
+  [
+    "Works as a freelance designer and AI evaluation specialist at Handshake AI.",
+    "Handshake AI में फ्रीलांस डिज़ाइनर और AI मूल्यांकन विशेषज्ञ के रूप में काम करते हैं।",
+    "Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ કરે છે.",
+  ],
+  [
+    "Reports creating all 11 supplied profile projects entirely through prompts; their paid/client status is not specified.",
+    "बताते हैं कि प्रोफ़ाइल में दिए गए सभी 11 प्रोजेक्ट पूरी तरह प्रॉम्प्ट से बनाए; उनका सवेतन या क्लाइंट-कार्य होना निर्दिष्ट नहीं है।",
+    "તેમના જણાવ્યા મુજબ પ્રોફાઇલમાં આપેલા તમામ 11 પ્રોજેક્ટ સંપૂર્ણપણે પ્રોમ્પ્ટથી બનાવ્યા; તે પગારવાળું કે ક્લાયન્ટનું કામ હતું કે નહીં તે સ્પષ્ટ નથી.",
+  ],
+  [
+    "Current evidence includes Handshake AI freelance design and AI evaluation work since May 2026. No direct IT-recruiting employment or paid AI-assisted web-development employment is documented.",
+    "मौजूदा प्रमाण में May 2026 से Handshake AI में फ्रीलांस डिज़ाइन और AI मूल्यांकन का काम शामिल है। सीधे IT-रिक्रूटिंग रोज़गार या सवेतन AI-सहायता प्राप्त वेब-डेवलपमेंट रोज़गार का दस्तावेज़ी प्रमाण नहीं है।",
+    "વર્તમાન પુરાવામાં May 2026 થી Handshake AI માં ફ્રીલાન્સ ડિઝાઇન અને AI મૂલ્યાંકનનું કામ શામેલ છે. સીધા IT ભરતીના રોજગાર અથવા પગારવાળા AI-સહાયિત વેબ ડેવલપમેન્ટના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
+  ],
+  [
+    "Career focus and targets, not employment titles. Handshake AI freelance design and AI evaluation work is reported from May 2026. No direct IT-recruiting employment, quantified work outcomes or paid AI-assisted web-development employment is documented.",
+    "करियर का केंद्र और लक्ष्य, नौकरी के पद नहीं। Handshake AI में फ्रीलांस डिज़ाइन और AI मूल्यांकन का काम May 2026 से होने की जानकारी दी गई है। सीधे IT-रिक्रूटिंग रोज़गार, काम के संख्यात्मक परिणाम या सवेतन AI-सहायता प्राप्त वेब-डेवलपमेंट रोज़गार का दस्तावेज़ी प्रमाण नहीं है।",
+    "કરિયરનું કેન્દ્ર અને લક્ષ્ય, નોકરીનાં પદો નહીં. Handshake AI માં ફ્રીલાન્સ ડિઝાઇન અને AI મૂલ્યાંકનનું કામ May 2026 થી હોવાની જાણ કરવામાં આવી છે. સીધા IT ભરતીના રોજગાર, કામના આંકડાકીય પરિણામો અથવા પગારવાળા AI-સહાયિત વેબ ડેવલપમેન્ટના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
+  ],
+  [
+    "Career focus, not past employment. Freelance Designer and AI Evaluation Specialist at Handshake AI since May 2026; organized operations at Jinarth Infotech and an IT degree with MERN development background. Direct IT-recruiting employment is not documented.",
+    "करियर का केंद्र, पिछली नौकरी नहीं। May 2026 से Handshake AI में फ्रीलांस डिज़ाइनर एवं AI मूल्यांकन विशेषज्ञ के रूप में काम; Jinarth Infotech में व्यवस्थित संचालन; और MERN डेवलपमेंट की पृष्ठभूमि वाली IT डिग्री। सीधे IT-रिक्रूटिंग रोज़गार का दस्तावेज़ी प्रमाण नहीं है।",
+    "કરિયરનું કેન્દ્ર, ભૂતકાળની નોકરી નહીં. May 2026 થી Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ; Jinarth Infotech માં વ્યવસ્થિત કામગીરી; અને MERN ડેવલપમેન્ટની પૃષ્ઠભૂમિ સાથેની IT ડિગ્રી. સીધા IT ભરતીના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
+  ],
+  [
+    "Career focus, not past employment. Freelance Designer and AI Evaluation Specialist at Handshake AI since May 2026; MERN development on MetroMart at Haronex Technology; and this portfolio plus 11 owner-supplied projects created through prompts. Supplied project links are available; no public source-code repository is supplied. No paid AI-assisted web-development employment is documented.",
+    "करियर का केंद्र, पिछली नौकरी नहीं। May 2026 से Handshake AI में फ्रीलांस डिज़ाइनर एवं AI मूल्यांकन विशेषज्ञ के रूप में काम; Haronex Technology में MetroMart पर MERN डेवलपमेंट; और यह पोर्टफ़ोलियो तथा मालिक द्वारा दिए गए प्रॉम्प्ट से बने 11 प्रोजेक्ट। दिए गए प्रोजेक्ट लिंक उपलब्ध हैं; कोई सार्वजनिक सोर्स-कोड रिपॉज़िटरी नहीं दी गई है। सवेतन AI-सहायता प्राप्त वेब-डेवलपमेंट रोज़गार का दस्तावेज़ी प्रमाण नहीं है।",
+    "કરિયરનું કેન્દ્ર, ભૂતકાળની નોકરી નહીં. May 2026 થી Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ; Haronex Technology માં MetroMart પર MERN ડેવલપમેન્ટ; અને આ પોર્ટફોલિયો ઉપરાંત માલિકે આપેલા પ્રોમ્પ્ટથી બનાવેલા 11 પ્રોજેક્ટ. આપેલી પ્રોજેક્ટ લિંક્સ ઉપલબ્ધ છે; જાહેર સોર્સ-કોડ રિપોઝિટરી આપવામાં આવી નથી. પગારવાળા AI-સહાયિત વેબ ડેવલપમેન્ટના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
+  ],
+);
+
 export function localizePortfolio(language: PortfolioLanguage): LocalizedPortfolio {
   if (language === 'en') return portfolio;
   const t = (s: string) => translate(language, s);
