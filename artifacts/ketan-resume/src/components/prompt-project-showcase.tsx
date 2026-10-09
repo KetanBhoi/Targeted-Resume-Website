@@ -79,7 +79,7 @@ export default function PromptProjectShowcase() {
             <span className="font-mono-custom text-[10px] text-muted-foreground">11 / 11</span>
           </div>
           <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {promptProjects.filter((project) => !project.featured).map((project) => <ProjectCard key={project.id} project={project} />)}
+            {promptProjects.map((project) => <ProjectCard key={project.id} project={project} />)}
           </div>
           <p className="mt-6 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
             <ExternalLink className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
