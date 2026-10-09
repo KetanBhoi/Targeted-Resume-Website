@@ -47,7 +47,7 @@ export const promptProjects: PromptProject[] = [
   {
     id: 'smarthire-ai', name: 'SmartHire AI', category: 'Presentation and guide', platform: 'Gamma',
     description: 'A hiring-team pilot pitch deck with audience-specific messaging and a real-results measurement plan instead of invented numbers. This is a presentation, not a working hiring product.',
-    url: 'https://gamma.app/docs/SmartHire-AI-pgbsb0ibqh0zamn', featured: false,
+    url: 'https://gamma.app/docs/SmartHire-AI-pgbsb0ibqh0zamn', featured: true,
   },
   {
     id: 'targeted-resume-website', name: 'Targeted Resume Website', category: 'Portfolio website', platform: 'Replit',
@@ -67,7 +67,7 @@ export const promptProjects: PromptProject[] = [
   {
     id: 'quickdraw', name: 'Quickdraw', category: 'Web app', platform: 'Netlify (hosting)',
     description: 'A multiplayer party-game project for 2-8 players using room codes, humorous prompts and voting. The creation tool is not specified; Netlify is the supplied hosting platform.',
-    url: 'https://incredible-tanuki-1cc31c.netlify.app/', featured: true,
+    url: 'https://incredible-tanuki-1cc31c.netlify.app/', featured: false,
   },
 ];
 

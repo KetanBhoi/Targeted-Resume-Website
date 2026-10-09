@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { AskAmbassadorBody, AskAmbassadorResponse } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { handshakeProjectFacts } from "../../lib/handshake-project-facts";
 
 const router: IRouter = Router();
 const refusal = "I don’t have verified information about that.";
@@ -17,6 +18,7 @@ const allowedSections = new Set([
 ]);
 
 const verifiedFacts = {
+  ...handshakeProjectFacts,
   candidate: {
     name: "Ketan Kaushikbhai Bhoi",
     targetRole: "IT Recruiter & AI-Assisted Web Developer | Prompt Engineering",
