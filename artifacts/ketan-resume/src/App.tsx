@@ -38,6 +38,8 @@ import { readPortfolioView, type PortfolioView } from '@/lib/portfolio-view';
 import { trackEvent } from '@/lib/analytics';
 import { PortfolioLanguageProvider, usePortfolioLanguage } from '@/lib/portfolio-language';
 import PortfolioLanguageSwitcher from '@/components/portfolio-language-switcher';
+import PromptProjectShowcase from '@/components/prompt-project-showcase';
+import { featuredPromptProjects, promptProjectCreation } from '@/data/prompt-projects';
 
 const queryClient = new QueryClient();
 const clerkPubKey = publishableKeyFromHost(
@@ -252,7 +254,7 @@ function RoleFit() {
             {t('Proof before')}<br /><span className="text-muted-foreground">{t('promises.')}</span>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-            {t('The resume does not list direct recruiting or AI employment. It does show patterns that can transfer into both target roles.')}
+            {t('There is no documented direct IT-recruiting employment or paid AI-assisted web-development employment. Handshake AI employment in AI evaluation is documented; other evidence transfers across both target roles.')}
           </p>
         </div>
         <div className="grid gap-3">
@@ -307,7 +309,7 @@ function Experience() {
                 </ul>
               </article>
             ))}
-            <article id="projects" className="anchor-target border border-primary bg-primary p-6 text-primary-foreground sm:p-8" data-testid="card-project-metromart">
+            <article className="border border-primary bg-primary p-6 text-primary-foreground sm:p-8" data-testid="card-project-metromart">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="font-mono-custom text-[10px] uppercase tracking-[0.16em] text-accent">{t('Work sample / project')}</p>
@@ -603,6 +605,15 @@ function downloadResume() {
       ...experience.bullets.map((bullet) => ({ text: `- ${bullet}`, size: 9, leading: 14 })),
       { text: '', size: 10, leading: 6 },
     ]),
+    { text: 'SELECTED PROMPT-CREATED PROJECTS', size: 11, leading: 19 },
+    { text: promptProjectCreation, size: 9, leading: 14 },
+    ...featuredPromptProjects.flatMap((project) => [
+      { text: `${project.name} | ${project.category} | ${project.platform}`, size: 9, leading: 14 },
+      { text: project.description, size: 8, leading: 12 },
+      { text: project.url, size: 8, leading: 12 },
+    ]),
+    { text: 'Project catalogue supplied by owner; capabilities are owner-reported, not independently tested. Some links may require account access.', size: 8, leading: 12 },
+    { text: '', size: 10, leading: 6 },
     { text: 'METROMART WORK SAMPLE', size: 11, leading: 19 },
     { text: `${portfolio.projects[0].name} - ${portfolio.projects[0].kind}`, size: 10, leading: 15 },
     { text: `Project scope: ${portfolio.projects[0].problem}`, size: 9, leading: 14 },
@@ -745,6 +756,7 @@ function Home() {
         {view === 'recruiter' && <><RoleFit /><Experience /><Skills /></>}
         {view === 'hiring-manager' && <><Experience /><RoleFit /><Skills /></>}
         {view === 'technical' && <><Skills /><Experience /><RoleFit /></>}
+        <PromptProjectShowcase />
         <Education />
         <PortfolioExtras />
         <PublicCaseStudies />

@@ -1,8 +1,8 @@
 export type PortfolioView = 'recruiter' | 'hiring-manager' | 'technical';
 export const portfolioViews: { value: PortfolioView; label: string; focus: string; evidence: string }[] = [
-  { value: 'recruiter', label: 'IT Recruiter', focus: 'Target role: structured evaluation and technology fluency', evidence: 'Career focus, not past employment. Structured evaluation skills, organized operations at Jinarth Infotech, and an IT degree with MERN development background. Direct recruiting experience is not documented.' },
+  { value: 'recruiter', label: 'IT Recruiter', focus: 'Target role: structured evaluation and technology fluency', evidence: 'Career focus, not past employment. Freelance Designer and AI Evaluation Specialist at Handshake AI since May 2026; organized operations at Jinarth Infotech and an IT degree with MERN development background. Direct IT-recruiting employment is not documented.' },
   { value: 'hiring-manager', label: 'Hiring manager', focus: 'Ownership and delivery', evidence: 'MetroMart vendor/customer modules and REST API integration; daily staff support and organized reports at Jinarth Infotech. No performance metrics are supplied.' },
-  { value: 'technical', label: 'AI Web Developer', focus: 'Target role: stack and prompt-driven building', evidence: 'Career focus, not past employment. MERN development on MetroMart at Haronex Technology, listed Prompt Engineering and LLM quality review skills, and this portfolio as a current work sample built through prompts in Replit. No source-code or live project link is supplied, and no AI employment is documented.' },
+  { value: 'technical', label: 'AI Web Developer', focus: 'Target role: stack and prompt-driven building', evidence: 'Career focus, not past employment. Freelance Designer and AI Evaluation Specialist at Handshake AI since May 2026; MERN development on MetroMart at Haronex Technology; and this portfolio plus 11 owner-supplied projects created through prompts. Supplied project links are available; no public source-code repository is supplied. No paid AI-assisted web-development employment is documented.' },
 ];
 
 export function readPortfolioView(): PortfolioView {

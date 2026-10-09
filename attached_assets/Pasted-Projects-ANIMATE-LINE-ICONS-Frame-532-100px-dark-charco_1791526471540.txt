@@ -1,0 +1,49 @@
+Projects
+
+ANIMATE LINE ICONS
+Frame: 532 × 100px, dark charcoal background (#0F0F14), 20px corner radius, horizontal auto-layout with 56px spacing and padding. Timeline: 4.5 seconds total. All animations use the same smooth custom cubic bezier easing (0.4, 0, 0.2, 1) — a fast-in, gentle-out curve. Four icons, 10 animated vector pieces: 1. Power (60×64) — Two pieces with overlapping timing: Arc — a ~300° open circle with a gap at the top. Draws from 0s → 0.7s. Line — vertical stroke through the gap. Draws from 0.2s → 0.6s
+www.figma.com/design/FLqlKACYVQqXbU5xbJsSxR/Untitled
+
+Personal Photo Gallery
+A full-page dark photography gallery built from the Figma design, featuring: Slider — prev/next arrow buttons with smooth 300ms slide + fade transitions between 6 photos Drag/swipe — click-drag on desktop, touch swipe on mobile to navigate Keyboard — left/right arrow keys cycle through photos Auto-play — advances every 5 seconds, pauses on any interaction Thumbnail strip — 6 clickable thumbnails at 50% opacity; active one gets a gold border and full opacity; hover scales to 1.05× URL hash sync
+www.figma.com/make/iAM3V8t1aKtIVb65oj01v9/Build-interactive-slider
+
+DRAW TO STICKER PACK
+I. Sketch Your Reference Set up a square canvas Create an 800×800 frame (✅ already done — your ) Draw the outline Use the Pen tool or Pencil tool (shortcut: P) to draw a rough outline of your subject — like the flower I created for you Add color and layer it Use the Fill panel on the right to add colors to your shapes Layer elements front-to-back (petals behind center, stem behind petals, etc.) II. Clean It Up with AI Turn the sketch into a finished illustration Select your sketch frame Go
+www.figma.com/design/zkrCwGZQrtYGTIKRkFMd67/Untitled
+
+Build, extend, and share a Gamma deck
+This document is a practical guide for first-time Gamma users. It explains how to create an account, choose a document type, define one clear insight, import source material, and remove content that does not support the main point. It also demonstrates useful Gamma extensions, including adding a chart with real numbers, asking the Agent to summarize the deck, rebuilding the deck from another source for comparison, adding speaker notes, rehearsing with the timer, and translating the presentation
+gamma.app/docs/Build-extend-and-share-a-Gamma-deck-3wdyuduhno9hj1h
+
+forma
+Forma is a four-step design tool: build a mood board from your own screenshots or a 24-image reference library, annotate each image with tags and notes, then let Forma generate a written design brief covering colour, type, imagery, layout, voice and guardrails. Describe your app in a sentence, add its core features, and Forma produces three phone screens you can click through, restyle, regenerate, and download as PNGs. It runs entirely in the browser with no accounts, database, or uploads — a re
+lovable.dev/preview/ipQ8fAsH89iEvUjGR00KNEbzCjmF9nEZ
+
+Lunchpad Creator
+Product Launch Page — A clean, modern launch page for a new product. It opens with a bold headline and a short pitch on the left, with an email signup box so visitors can join the waitlist. Laptop and phone mockups on the right show off the product. After someone signs up, they see a friendly confirmation message, and if they type an email wrong, the page tells them.
+lovable.dev/preview/qCVgHDUvO0naC9K630yT0T35Vw8ipSml
+
+SMARTHIRE AI
+SmartHire AI pitch for a hiring-team pilot, with the audience and approval ask on the opening slide. I also embedded the two requested extensions: audience-specific tailoring and a strict replacement of invented numbers with a real-results measurement plan
+gamma.app/docs/SmartHire-AI-pgbsb0ibqh0zamn
+
+targeted-resume-website
+Ketan Bhoi’s recruiter portfolio presents evidence-backed experience, transferable skills, education, and a downloadable resume for recruiter and talent acquisition roles. Its private workspace helps manage resume versions and job applications, compare resumes with job descriptions, identify keyword and skill gaps, prepare interview and cover-letter drafts, and manage follow-ups. AI-tailored resumes remain marked for review until their facts are verified.
+targeted-resume-website.replit.app/
+
+ApplyFlow AI Studio Repetitive Application Autopilot & Standing Rules Engine
+ApplyFlow is a job search command center that automates repetitive application busywork using Gemini AI and permanent standing rules. Core Features: Job Scanner & Spec Parser: Instantly extracts required skills, salary ranges, and hidden red flags from any raw job description. ATS Resume Bullet Tailor: Generates quantified XYZ-formula bullet points grounded in your real experience without hallucinating credentials. Permanent Standing Rules: Locks in preferences (e.g. zero buzzwords, sub-150-word
+ai.studio/apps/40df71af-4d52-4863-b6b0-5f4403267118
+
+TARGATED RESUME WEBSITE
+Ketan Bhoi’s recruiter portfolio presents evidence-backed experience, transferable skills, education, and a downloadable resume for recruiter and talent acquisition roles. Its private workspace helps manage resume versions and job applications, compare resumes with job descriptions, identify keyword and skill gaps, prepare interview and cover-letter drafts, and manage follow-ups. AI-tailored resumes remain marked for review until their facts are verified.
+targeted-resume-website.replit.app/
+
+EVENT LUANCH KIT
+Perfume Launch Kit helps organizers create and publish perfume launch events, showcase fragrances, manage private RSVPs, and download promotional materials.
+event-launch-kit-kkbhoi09.replit.app/
+
+QUICKDRAW
+Quickdraw is a fast, funny multiplayer party game for 2–8 players. Join with a room code, answer silly prompts, and vote for the funniest response. Play together from anywhere—no shared room required.
+incredible-tanuki-1cc31c.netlify.app/
