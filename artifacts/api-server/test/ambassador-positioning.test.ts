@@ -54,6 +54,22 @@ describe('dual-career ambassador positioning', () => {
     expect((await ask('What prior IT recruiting employment is documented?')).answer)
       .toBe('I don’t have verified information about that.');
   });
+  it('grounds the Handshake AI role and all prompt-created project links in owner-supplied facts', async () => {
+    generation.output = JSON.stringify({
+      supported: true,
+      answer: 'The profile owner reports working at Handshake AI as a freelance designer and AI evaluation specialist since May 2026.',
+      section: 'experience',
+      factIds: ['handshakeFreelanceExperience'],
+    });
+    const answer = await ask('What is the current Handshake AI role?');
+    expect(answer.section).toBe('experience');
+    expect(generation.system).toContain('"handshakeFreelanceExperience"');
+    expect(generation.system).toContain('Freelance Designer and AI Evaluation Specialist');
+    expect(generation.system).toContain('May 2026');
+    expect(generation.system).toContain('handshakeProjectForma');
+    expect(generation.system).toContain('https://lovable.dev/preview/ipQ8fAsH89iEvUjGR00KNEbzCjmF9nEZ');
+    expect(generation.system).toContain('client/pay status is not supplied');
+  });
   it('keeps prompt-injection defenses while allowing genuine prompt-engineering questions', async () => {
     generation.output = JSON.stringify({
       supported: true, answer: 'Prompt engineering is listed among the skills.',

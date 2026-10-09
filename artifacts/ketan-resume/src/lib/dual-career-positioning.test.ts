@@ -8,7 +8,7 @@ describe('approved dual-career positioning', () => {
     expect(portfolio.targetRole).toBe('IT Recruiter & AI-Assisted Web Developer | Prompt Engineering');
     expect(portfolioViews.find((view) => view.value === 'recruiter')?.label).toBe('IT Recruiter');
     expect(portfolioViews.find((view) => view.value === 'technical')?.label).toBe('AI Web Developer');
-    expect(portfolio.context).toContain('not past employment');
+    expect(portfolio.context).toContain('not prior job titles');
     expect(portfolio.experiences.map((entry) => entry.title)).toEqual([
       'Freelance Designer & AI Evaluation Specialist',
       'MERN Stack Web Developer',
@@ -43,6 +43,7 @@ describe('approved dual-career positioning', () => {
     const phrases = [
       portfolio.targetRole, portfolio.positioning, portfolio.context,
       strength.title, strength.detail, strength.proof,
+      portfolio.experiences[0].title, ...portfolio.experiences[0].bullets,
       sample.name, sample.kind, sample.context, sample.problem, sample.contribution, sample.outcome,
       ...portfolioViews.flatMap((view) => [view.label, view.focus, view.evidence]),
     ];

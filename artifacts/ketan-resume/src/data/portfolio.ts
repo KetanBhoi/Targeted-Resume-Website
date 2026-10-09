@@ -41,8 +41,8 @@ export const portfolio = {
       company: "Handshake AI",
       dates: "May 2026 – Present",
       bullets: [
-        "Works as a freelance designer and AI evaluation specialist at Handshake AI, according to the profile owner.",
-        "Reports creating all 11 unique projects in the supplied Handshake AI profile entirely through prompts; their paid/client status is not specified.",
+        "Works as a freelance designer and AI evaluation specialist at Handshake AI.",
+        "Reports creating all 11 supplied profile projects entirely through prompts; their paid/client status is not specified.",
       ],
     },
     {
