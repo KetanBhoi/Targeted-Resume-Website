@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 import { portfolio } from '../data/portfolio';
 import { portfolioViews, publicPortfolioUrl, type PortfolioView } from './portfolio-view';
 
-export const careerBriefLimitation = 'Limitations: career focus and target roles, not past employment. The resume documents no performance metrics, no direct recruiting experience, and no prior AI employment.';
+export const careerBriefLimitation = 'Career focus and targets, not employment titles. Handshake AI freelance design and AI evaluation work is reported from May 2026. No direct IT-recruiting employment, quantified work outcomes or paid AI-assisted web-development employment is documented.';
 export const careerBriefUrl = (view: PortfolioView) => `${publicPortfolioUrl}/brief?view=${view}`;
 
 /** A concise, one-page English brief; leave room for the QR only in the header. */

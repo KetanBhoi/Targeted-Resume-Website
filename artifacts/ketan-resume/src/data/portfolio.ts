@@ -2,9 +2,9 @@ export const portfolio = {
   name: "Ketan Kaushikbhai Bhoi",
   targetRole: "IT Recruiter & AI-Assisted Web Developer | Prompt Engineering",
   positioning:
-    "An early-career candidate with two target roles, IT recruiter and AI-assisted web developer, bringing structured evaluation, detail-minded operations, and hands-on web development.",
+    "An early-career professional with current freelance design and AI evaluation experience, a background in software development, and goals in IT recruitment and AI-assisted web development through prompt engineering.",
   context:
-    "These are career focus areas and target roles, not past employment. The resume documents IT education and software-development experience; it documents no direct recruiting or AI employment. The strengths below are transferable evidence.",
+    "Freelance Designer & AI Evaluation Specialist at Handshake AI since May 2026, alongside earlier web-development roles. IT recruitment and AI-assisted web development are target career paths, not prior job titles. Direct IT-recruiting employment and paid AI-assisted web-development employment are not documented.",
   strengths: [
     {
       title: "Structured evaluation",
@@ -36,6 +36,15 @@ export const portfolio = {
     },
   ],
   experiences: [
+    {
+      title: "Freelance Designer & AI Evaluation Specialist",
+      company: "Handshake AI",
+      dates: "May 2026 – Present",
+      bullets: [
+        "Works as a freelance designer and AI evaluation specialist at Handshake AI, according to the profile owner.",
+        "Reports creating all 11 unique projects in the supplied Handshake AI profile entirely through prompts; their paid/client status is not specified.",
+      ],
+    },
     {
       title: "MERN Stack Web Developer",
       company: "Haronex Technology",
