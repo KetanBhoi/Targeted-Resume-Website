@@ -68,7 +68,7 @@ describe('dual-career ambassador positioning', () => {
     expect(generation.system).toContain('May 2026');
     expect(generation.system).toContain('handshakeProjectForma');
     expect(generation.system).toContain('https://lovable.dev/preview/ipQ8fAsH89iEvUjGR00KNEbzCjmF9nEZ');
-    expect(generation.system).toContain('client/pay status is not supplied');
+    expect(generation.system).toContain('does not specify which projects were paid client work');
   });
   it('keeps prompt-injection defenses while allowing genuine prompt-engineering questions', async () => {
     generation.output = JSON.stringify({

@@ -384,6 +384,11 @@ translationEntries.push(
     "ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત",
   ],
   [
+    "Handshake AI project profile (owner-reported)",
+    "Handshake AI प्रोजेक्ट प्रोफ़ाइल (मालिक की दी हुई जानकारी)",
+    "Handshake AI પ્રોજેક્ટ પ્રોફાઇલ (માલિક દ્વારા આપેલી માહિતી)",
+  ],
+  [
     "Works as a freelance designer and AI evaluation specialist at Handshake AI.",
     "Handshake AI में फ्रीलांस डिज़ाइनर और AI मूल्यांकन विशेषज्ञ के रूप में काम करते हैं।",
     "Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ કરે છે.",
