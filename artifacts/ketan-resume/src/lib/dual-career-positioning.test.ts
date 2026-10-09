@@ -47,9 +47,12 @@ describe('approved dual-career positioning', () => {
       sample.name, sample.kind, sample.context, sample.problem, sample.contribution, sample.outcome,
       ...portfolioViews.flatMap((view) => [view.label, view.focus, view.evidence]),
     ];
+    const missingTranslations = phrases.filter(
+      (phrase) => !translationEntries.find(([english]) => english === phrase),
+    );
+    expect(missingTranslations).toEqual([]);
     for (const phrase of phrases) {
       const translation = translationEntries.find(([english]) => english === phrase);
-      expect(translation, `Missing translation: ${phrase}`).toBeDefined();
       expect(translation?.[1]).toBeTruthy();
       expect(translation?.[2]).toBeTruthy();
     }

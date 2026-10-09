@@ -389,6 +389,11 @@ translationEntries.push(
     "Handshake AI પ્રોજેક્ટ પ્રોફાઇલ (માલિક દ્વારા આપેલી માહિતી)",
   ],
   [
+    "Created this portfolio entirely through prompts in Replit. Its capabilities include a public page in English, Hindi, and Gujarati, role views, a one-page brief PDF, a resume Q&A, and a signed-in private workspace.",
+    "यह पोर्टफ़ोलियो Replit में पूरी तरह प्रॉम्प्ट से बनाया गया। इसमें अंग्रेज़ी, हिंदी और गुजराती में सार्वजनिक पृष्ठ, भूमिका-दृष्टिकोण, एक-पृष्ठ का ब्रीफ़ PDF, रिज़्यूमे प्रश्नोत्तर और साइन-इन के बाद उपलब्ध निजी वर्कस्पेस शामिल हैं।",
+    "આ પોર્ટફોલિયો સંપૂર્ણપણે Replit માં પ્રોમ્પ્ટ દ્વારા બનાવ્યો છે. તેમાં અંગ્રેજી, હિન્દી અને ગુજરાતીમાં જાહેર પાનું, ભૂમિકા-દૃષ્ટિકોણો, એક-પાનાનું બ્રીફ PDF, રેઝ્યૂમે પ્રશ્નોત્તરી અને સાઇન-ઇન પછી મળતું ખાનગી વર્કસ્પેસ સામેલ છે.",
+  ],
+  [
     "Works as a freelance designer and AI evaluation specialist at Handshake AI.",
     "Handshake AI में फ्रीलांस डिज़ाइनर और AI मूल्यांकन विशेषज्ञ के रूप में काम करते हैं।",
     "Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ કરે છે.",
