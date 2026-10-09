@@ -254,7 +254,7 @@ function RoleFit() {
             {t('Proof before')}<br /><span className="text-muted-foreground">{t('promises.')}</span>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-6 text-muted-foreground">
-            {t('There is no documented direct IT-recruiting employment or paid AI-assisted web-development employment. Handshake AI employment in AI evaluation is documented; other evidence transfers across both target roles.')}
+            {t('Current evidence includes Handshake AI freelance design and AI evaluation work since May 2026. No direct IT-recruiting employment or paid AI-assisted web-development employment is documented.')}
           </p>
         </div>
         <div className="grid gap-3">
