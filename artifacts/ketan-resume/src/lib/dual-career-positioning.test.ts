@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { portfolio } from '../data/portfolio';
 import { portfolioViews } from './portfolio-view';
-import { translationEntries } from './portfolio-translations';
+import { localizePortfolio, translate, translationEntries } from './portfolio-translations';
 
 describe('approved dual-career positioning', () => {
   it('gives both target roles explicit visibility without inventing employment', () => {
@@ -56,5 +56,16 @@ describe('approved dual-career positioning', () => {
       expect(translation?.[1]).toBeTruthy();
       expect(translation?.[2]).toBeTruthy();
     }
+    const hindi = localizePortfolio('hi');
+    const gujarati = localizePortfolio('gu');
+    for (const localized of [hindi, gujarati]) {
+      expect(localized.positioning).not.toBe(portfolio.positioning);
+      expect(localized.experiences[0].title).not.toBe(portfolio.experiences[0].title);
+      for (const index of [0, 1]) {
+        expect(localized.experiences[0].bullets[index]).not.toBe(portfolio.experiences[0].bullets[index]);
+      }
+    }
+    expect(translate('gu', portfolioViews[0].evidence)).not.toContain('Freelance Designer');
+    expect(translate('hi', portfolioViews[2].evidence)).not.toContain('Freelance Designer');
   });
 });

@@ -350,18 +350,6 @@ export const translationEntries: [string, string, string][] = [
 ];
 
 type Dict = Record<string, string>;
-const hi: Dict = {};
-const gu: Dict = {};
-for (const [en, h, g] of translationEntries) {
-  hi[en] = h;
-  gu[en] = g;
-}
-export const dictionaries: Record<'hi' | 'gu', Dict> = { hi, gu };
-
-export function translate(language: PortfolioLanguage, english: string): string {
-  if (language === 'en') return english;
-  return dictionaries[language][english] ?? english;
-}
 
 export type LocalizedPortfolio = typeof portfolio;
 
@@ -429,6 +417,19 @@ translationEntries.push(
     "કરિયરનું કેન્દ્ર, ભૂતકાળની નોકરી નહીં. May 2026 થી Handshake AI માં ફ્રીલાન્સ ડિઝાઇનર અને AI મૂલ્યાંકન નિષ્ણાત તરીકે કામ; Haronex Technology માં MetroMart પર MERN ડેવલપમેન્ટ; અને આ પોર્ટફોલિયો ઉપરાંત માલિકે આપેલા પ્રોમ્પ્ટથી બનાવેલા 11 પ્રોજેક્ટ. આપેલી પ્રોજેક્ટ લિંક્સ ઉપલબ્ધ છે; જાહેર સોર્સ-કોડ રિપોઝિટરી આપવામાં આવી નથી. પગારવાળા AI-સહાયિત વેબ ડેવલપમેન્ટના રોજગારનો દસ્તાવેજી પુરાવો નથી.",
   ],
 );
+
+const hi: Dict = {};
+const gu: Dict = {};
+for (const [en, h, g] of translationEntries) {
+  hi[en] = h;
+  gu[en] = g;
+}
+export const dictionaries: Record<'hi' | 'gu', Dict> = { hi, gu };
+
+export function translate(language: PortfolioLanguage, english: string): string {
+  if (language === 'en') return english;
+  return dictionaries[language][english] ?? english;
+}
 
 export function localizePortfolio(language: PortfolioLanguage): LocalizedPortfolio {
   if (language === 'en') return portfolio;
