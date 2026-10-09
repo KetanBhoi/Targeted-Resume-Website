@@ -440,7 +440,7 @@ export function localizePortfolio(language: PortfolioLanguage): LocalizedPortfol
     positioning: t(portfolio.positioning),
     context: t(portfolio.context),
     strengths: portfolio.strengths.map((s) => ({ ...s, title: t(s.title), detail: t(s.detail), proof: t(s.proof) })),
-    experiences: portfolio.experiences.map((e) => ({ ...e, bullets: e.bullets.map(t) })),
+    experiences: portfolio.experiences.map((e) => ({ ...e, title: t(e.title), bullets: e.bullets.map(t) })),
     projects: portfolio.projects.map((p) => ({
       ...p, name: t(p.name), kind: t(p.kind), context: t(p.context), problem: t(p.problem), contribution: t(p.contribution), outcome: t(p.outcome),
     })),
